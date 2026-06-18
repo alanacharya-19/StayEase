@@ -63,7 +63,7 @@ export default function LoginPage() {
             <label className={`block text-sm font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Password</label>
             <div className="relative">
               <input type={showPw ? 'text' : 'password'} {...register('password')} className={`w-full px-4 py-2.5 pr-10 rounded-lg text-sm outline-none border ${errors.password ? 'border-red-500' : isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'}`} placeholder="••••••••" />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"><EyeOff size={16} /></button>
+              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">{showPw ? <Eye size={16} /> : <EyeOff size={16} />}</button>
             </div>
             {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
           </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { User, Calendar, Heart, Star, Bell, Settings, LogOut, BookOpen, MapPin, Clock, ChevronRight } from 'lucide-react'
+import { User, Calendar, Heart, Star, Bell, Settings, LogOut, Clock } from 'lucide-react'
 import { useThemeStore, useAuthStore, useBookingStore, useWishlistStore } from '../store'
 import { BookingCard, HotelCard } from '../components/cards'
 import { Breadcrumb } from '../components/ui'

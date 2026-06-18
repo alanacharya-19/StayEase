@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useThemeStore } from '../../store'
-import { Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube, ChevronRight } from 'lucide-react'
+import { Mail, Phone, MapPin, Globe, Camera, MessageCircle, Video, ChevronRight } from 'lucide-react'
 
 const footerLinks = {
   company: [
@@ -107,16 +107,16 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-4">
               <a href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
-                <Facebook size={16} />
+                <Globe size={16} />
               </a>
               <a href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
-                <Twitter size={16} />
+                <MessageCircle size={16} />
               </a>
               <a href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
-                <Instagram size={16} />
+                <Camera size={16} />
               </a>
               <a href="#" className="w-9 h-9 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors">
-                <Youtube size={16} />
+                <Video size={16} />
               </a>
             </div>
           </div>
