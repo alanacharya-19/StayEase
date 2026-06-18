@@ -26,7 +26,11 @@ export default function Navbar() {
   const isDark = theme === 'dark'
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isDark ? 'glass-dark' : 'glass'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isDark
+        ? 'bg-dark-bg/85 backdrop-blur-lg border-b border-dark-border/40'
+        : 'bg-white/90 backdrop-blur-lg border-b border-gray-200/50 shadow-sm shadow-black/5'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           <Link to="/" className="flex items-center gap-2">
@@ -148,7 +152,9 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className={`border-t ${isDark ? 'border-dark-border' : 'border-gray-100'}`}
+            className={`border-t ${
+              isDark ? 'border-dark-border/40 bg-dark-bg/85' : 'border-gray-200/50 bg-white/90'
+            }`}
           >
             <div className="max-w-3xl mx-auto px-4 py-4">
               <div className="relative">
@@ -198,7 +204,9 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className={`lg:hidden border-t ${isDark ? 'border-dark-border' : 'border-gray-100'}`}
+            className={`lg:hidden border-t ${
+              isDark ? 'border-dark-border/40 bg-dark-bg/95' : 'border-gray-200/50 bg-white/95'
+            }`}
           >
             <div className="px-4 py-4 space-y-2">
               {navLinks.map((link) => (

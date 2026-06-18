@@ -24,6 +24,20 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+/* Date input color scheme for dark mode */
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
+/* Input autofill overrides */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f1f5f9;
+  -webkit-box-shadow: 0 0 0px 1000px #1e293b inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .font-display {
   font-family: 'Playfair Display', serif;
 }

@@ -131,8 +131,10 @@ export default function HotelsPage() {
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
             placeholder="Search by hotel name, city, or country..."
-            className={`w-full pl-12 pr-4 py-3 rounded-xl outline-none border transition-colors ${
-              isDark ? 'bg-dark-card text-white border-dark-border placeholder-gray-500' : 'bg-white text-gray-900 border-gray-200 placeholder-gray-400'
+            className={`w-full pl-12 pr-4 py-3 rounded-xl outline-none border transition-all duration-200 ${
+              isDark
+                ? 'bg-dark-card/80 text-white border-dark-border/60 placeholder-gray-500 focus:border-primary/50 focus:bg-dark-card focus:shadow-lg focus:shadow-primary/5'
+                : 'bg-white/80 text-gray-900 border-gray-200/60 placeholder-gray-400 focus:border-primary/30 focus:bg-white focus:shadow-lg focus:shadow-primary/5'
             }`}
           />
         </div>

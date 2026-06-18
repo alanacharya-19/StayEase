@@ -30,62 +30,84 @@ export default function SearchBar({ variant = 'hero' }) {
       transition={{ delay: 0.3, duration: 0.6 }}
       className={`w-full max-w-4xl mx-auto ${
         isHero
-          ? 'glass rounded-2xl p-2 sm:p-3'
-          : `${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'} rounded-xl p-3`
-      } shadow-lg`}
+          ? isDark
+            ? 'bg-dark-card/90 backdrop-blur-md border border-dark-border/60 rounded-2xl p-2 sm:p-3'
+            : 'bg-white/90 backdrop-blur-md border border-white/20 rounded-2xl p-2 sm:p-3'
+          : `${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-200'} rounded-xl p-3`
+      } shadow-lg shadow-black/5`}
     >
-      <div className={`flex flex-col lg:flex-row gap-2 ${isHero ? '' : ''}`}>
-        <div className="flex-1 relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            value={query.city}
-            onChange={(e) => setQuery({ ...query, city: e.target.value })}
-            placeholder="Where are you going?"
-            className={`w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-colors ${
-              isDark ? 'bg-dark-border text-white placeholder-gray-500' : 'bg-gray-50 text-gray-900 placeholder-gray-400'
-            }`}
-          />
+      <div className="flex flex-col lg:flex-row items-end gap-2">
+        <div className="flex-1 w-full flex flex-col gap-1">
+          <span className={`text-[11px] font-medium tracking-wide uppercase ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Destination</span>
+          <div className="relative">
+            <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+            <input
+              type="text"
+              value={query.city}
+              onChange={(e) => setQuery({ ...query, city: e.target.value })}
+              placeholder="Where are you going?"
+              className={`w-full pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-200 ${
+                isDark
+                  ? 'bg-dark-border/80 text-white placeholder-gray-500 border border-transparent focus:border-primary/50 focus:bg-dark-border'
+                  : 'bg-gray-100/80 text-gray-900 placeholder-gray-400 border border-transparent focus:border-primary/30 focus:bg-white'
+              }`}
+            />
+          </div>
         </div>
-        <div className="relative">
-          <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="date"
-            value={query.checkIn}
-            onChange={(e) => setQuery({ ...query, checkIn: e.target.value })}
-            className={`w-full lg:w-36 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-colors ${
-              isDark ? 'bg-dark-border text-white' : 'bg-gray-50 text-gray-900'
-            }`}
-          />
+        <div className="w-full lg:w-auto flex flex-col gap-1">
+          <span className={`text-[11px] font-medium tracking-wide uppercase ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Check in</span>
+          <div className="relative">
+            <Calendar size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+            <input
+              type="date"
+              value={query.checkIn}
+              onChange={(e) => setQuery({ ...query, checkIn: e.target.value })}
+              className={`w-full lg:w-36 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-200 ${
+                isDark
+                  ? 'bg-dark-border/80 text-white border border-transparent focus:border-primary/50 focus:bg-dark-border'
+                  : 'bg-gray-100/80 text-gray-900 border border-transparent focus:border-primary/30 focus:bg-white'
+              }`}
+            />
+          </div>
         </div>
-        <div className="relative">
-          <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="date"
-            value={query.checkOut}
-            onChange={(e) => setQuery({ ...query, checkOut: e.target.value })}
-            className={`w-full lg:w-36 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-colors ${
-              isDark ? 'bg-dark-border text-white' : 'bg-gray-50 text-gray-900'
-            }`}
-          />
+        <div className="w-full lg:w-auto flex flex-col gap-1">
+          <span className={`text-[11px] font-medium tracking-wide uppercase ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Check out</span>
+          <div className="relative">
+            <Calendar size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+            <input
+              type="date"
+              value={query.checkOut}
+              onChange={(e) => setQuery({ ...query, checkOut: e.target.value })}
+              className={`w-full lg:w-36 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-200 ${
+                isDark
+                  ? 'bg-dark-border/80 text-white border border-transparent focus:border-primary/50 focus:bg-dark-border'
+                  : 'bg-gray-100/80 text-gray-900 border border-transparent focus:border-primary/30 focus:bg-white'
+              }`}
+            />
+          </div>
         </div>
-        <div className="relative">
-          <Users size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <select
-            value={query.guests}
-            onChange={(e) => setQuery({ ...query, guests: e.target.value })}
-            className={`w-full lg:w-28 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none appearance-none transition-colors ${
-              isDark ? 'bg-dark-border text-white' : 'bg-gray-50 text-gray-900'
-            }`}
-          >
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <option key={n} value={n}>{n} Guest{n > 1 ? 's' : ''}</option>
-            ))}
-          </select>
+        <div className="w-full lg:w-auto flex flex-col gap-1">
+          <span className={`text-[11px] font-medium tracking-wide uppercase ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Guests</span>
+          <div className="relative">
+            <Users size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
+            <select
+              value={query.guests}
+              onChange={(e) => setQuery({ ...query, guests: e.target.value })}
+              className={`w-full lg:w-28 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none appearance-none transition-all duration-200 ${
+                isDark
+                  ? 'bg-dark-border/80 text-white border border-transparent focus:border-primary/50 focus:bg-dark-border'
+                  : 'bg-gray-100/80 text-gray-900 border border-transparent focus:border-primary/30 focus:bg-white'
+              }`}
+            >
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <option key={n} value={n}>{n} Guest{n > 1 ? 's' : ''}</option>
+              ))}
+            </select>
+          </div>
         </div>
         <button
           type="submit"
-          className="px-6 py-2.5 gradient-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity whitespace-nowrap"
+          className="w-full lg:w-auto px-6 py-2.5 gradient-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-all duration-200 whitespace-nowrap hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
         >
           Search
         </button>
