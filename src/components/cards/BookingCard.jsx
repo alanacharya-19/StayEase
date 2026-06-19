@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Calendar, MapPin, Users } from 'lucide-react'
+import { Calendar, Users } from 'lucide-react'
 import { useThemeStore } from '../../store'
 import { formatCurrency, formatDate } from '../../utils'
 

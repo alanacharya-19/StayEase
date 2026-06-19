@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CreditCard, Smartphone, Wallet, DollarSign, CheckCircle, Download, ArrowLeft } from 'lucide-react'
+import { CreditCard, Smartphone, Wallet, DollarSign, CheckCircle, Download } from 'lucide-react'
 import { useThemeStore, useBookingStore } from '../store'
 import { Breadcrumb } from '../components/ui'
 import { formatCurrency } from '../utils'

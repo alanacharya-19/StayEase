@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { SlidersHorizontal, X, Search, Star, ChevronDown } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { SlidersHorizontal, Search, Star, ChevronDown } from 'lucide-react'
 import { useThemeStore } from '../store'
 import { useHotels } from '../hooks/useQueries'
 import { HotelCard } from '../components/cards'
 import { Pagination, SkeletonList } from '../components/ui'
-import { amenitiesList, sortOptions, starRatings, priceRanges } from '../constants'
+import { amenitiesList, sortOptions, starRatings } from '../constants'
 import Breadcrumb from '../components/ui/Breadcrumb'
 
 export default function HotelsPage() {
@@ -141,120 +141,68 @@ export default function HotelsPage() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Filters Sidebar */}
-          <AnimatePresence>
-            {(filtersOpen || true) && (
-              <motion.aside
-                initial={false}
-                animate={{ width: filtersOpen ? 280 : 0, opacity: filtersOpen ? 1 : 0 }}
-                transition={{ duration: 0.3 }}
-                className={`shrink-0 overflow-hidden ${filtersOpen ? '' : 'hidden lg:block lg:w-0'}`}
-              >
-                <div className={`w-[280px] p-5 rounded-xl ${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'}`}>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Filters</h3>
-                    {hasFilters && (
-                      <button onClick={clearFilters} className="text-xs text-primary hover:underline">Clear All</button>
-                    )}
-                  </div>
+          <motion.aside
+            animate={{ width: filtersOpen ? 280 : 0, opacity: filtersOpen ? 1 : 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className={`shrink-0 overflow-hidden ${filtersOpen ? '' : 'lg:max-w-0'}`}
+          >
+            <div className={`w-[280px] p-5 rounded-xl ${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'}`}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Filters</h3>
+                {hasFilters && (
+                  <button onClick={clearFilters} className="text-xs text-primary hover:underline">Clear All</button>
+                )}
+              </div>
 
-                  {/* Price Range */}
-                  <div className="mb-5">
-                    <h4 className="text-sm font-medium mb-2">Price Range</h4>
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        placeholder="Min"
-                        value={filters.priceMin}
-                        onChange={(e) => { setFilters({ ...filters, priceMin: e.target.value }); setPage(1) }}
-                        className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${
-                          isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'
-                        }`}
-                      />
-                      <span className="self-center text-gray-400">-</span>
-                      <input
-                        type="number"
-                        placeholder="Max"
-                        value={filters.priceMax}
-                        onChange={(e) => { setFilters({ ...filters, priceMax: e.target.value }); setPage(1) }}
-                        className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${
-                          isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Star Rating */}
-                  <div className="mb-5">
-                    <h4 className="text-sm font-medium mb-2">Star Rating</h4>
-                    <div className="flex gap-2">
-                      {starRatings.map((s) => (
-                        <button
-                          key={s}
-                          onClick={() => { setFilters({ ...filters, stars: filters.stars === s.toString() ? '' : s.toString() }); setPage(1) }}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                            filters.stars === s.toString()
-                              ? 'bg-primary text-white'
-                              : isDark
-                              ? 'bg-dark-border text-gray-300 hover:bg-dark-border'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                          }`}
-                        >
-                          <Star size={12} fill={filters.stars === s.toString() ? 'white' : 'none'} />
-                          {s}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* City */}
-                  <div className="mb-5">
-                    <h4 className="text-sm font-medium mb-2">City</h4>
-                    <input
-                      type="text"
-                      value={filters.city}
-                      onChange={(e) => { setFilters({ ...filters, city: e.target.value }); setPage(1) }}
-                      placeholder="Filter by city..."
-                      className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${
-                        isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'
-                      }`}
-                    />
-                  </div>
-
-                  {/* Country */}
-                  <div className="mb-5">
-                    <h4 className="text-sm font-medium mb-2">Country</h4>
-                    <input
-                      type="text"
-                      value={filters.country}
-                      onChange={(e) => { setFilters({ ...filters, country: e.target.value }); setPage(1) }}
-                      placeholder="Filter by country..."
-                      className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${
-                        isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'
-                      }`}
-                    />
-                  </div>
-
-                  {/* Amenities */}
-                  <div className="mb-5">
-                    <h4 className="text-sm font-medium mb-2">Amenities</h4>
-                    <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                      {amenitiesList.map((amenity) => (
-                        <label key={amenity} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={filters.amenities.includes(amenity)}
-                            onChange={() => toggleAmenity(amenity)}
-                            className="rounded border-gray-300 text-primary focus:ring-primary"
-                          />
-                          <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{amenity}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+              {/* Price Range */}
+              <div className="mb-5">
+                <h4 className="text-sm font-medium mb-2">Price Range</h4>
+                <div className="flex gap-2">
+                  <input type="number" placeholder="Min" value={filters.priceMin} onChange={(e) => { setFilters({ ...filters, priceMin: e.target.value }); setPage(1) }} className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'}`} />
+                  <span className="self-center text-gray-400">-</span>
+                  <input type="number" placeholder="Max" value={filters.priceMax} onChange={(e) => { setFilters({ ...filters, priceMax: e.target.value }); setPage(1) }} className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'}`} />
                 </div>
+              </div>
+
+              {/* Star Rating */}
+              <div className="mb-5">
+                <h4 className="text-sm font-medium mb-2">Star Rating</h4>
+                <div className="flex gap-2">
+                  {starRatings.map((s) => (
+                    <button key={s} onClick={() => { setFilters({ ...filters, stars: filters.stars === s.toString() ? '' : s.toString() }); setPage(1) }} className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filters.stars === s.toString() ? 'bg-primary text-white' : isDark ? 'bg-dark-border text-gray-300 hover:bg-dark-border' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                      <Star size={12} fill={filters.stars === s.toString() ? 'white' : 'none'} />
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* City */}
+              <div className="mb-5">
+                <h4 className="text-sm font-medium mb-2">City</h4>
+                <input type="text" value={filters.city} onChange={(e) => { setFilters({ ...filters, city: e.target.value }); setPage(1) }} placeholder="Filter by city..." className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'}`} />
+              </div>
+
+              {/* Country */}
+              <div className="mb-5">
+                <h4 className="text-sm font-medium mb-2">Country</h4>
+                <input type="text" value={filters.country} onChange={(e) => { setFilters({ ...filters, country: e.target.value }); setPage(1) }} placeholder="Filter by country..." className={`w-full px-3 py-2 rounded-lg text-sm outline-none border ${isDark ? 'bg-dark-border text-white border-dark-border' : 'bg-gray-50 text-gray-900 border-gray-200'}`} />
+              </div>
+
+              {/* Amenities */}
+              <div className="mb-5">
+                <h4 className="text-sm font-medium mb-2">Amenities</h4>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                  {amenitiesList.map((amenity) => (
+                    <label key={amenity} className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={filters.amenities.includes(amenity)} onChange={() => toggleAmenity(amenity)} className="rounded border-gray-300 text-primary focus:ring-primary" />
+                      <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>{amenity}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
               </motion.aside>
-            )}
-          </AnimatePresence>
 
           {/* Results */}
           <div className="flex-1 min-w-0">

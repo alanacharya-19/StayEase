@@ -1,9 +1,9 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Users, Bed, Check, X, Calendar, Wifi } from 'lucide-react'
+import { Users, Bed, Check, X, Calendar } from 'lucide-react'
 import { useThemeStore, useBookingStore } from '../store'
 import { useHotel } from '../hooks/useQueries'
-import { ImageCarousel, Breadcrumb } from '../components/ui'
+import { Breadcrumb } from '../components/ui'
 import { formatCurrency } from '../utils'
 
 export default function RoomDetailsPage() {

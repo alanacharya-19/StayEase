@@ -5,7 +5,6 @@ import { User, Calendar, Heart, Star, Bell, Settings, LogOut, Clock } from 'luci
 import { useThemeStore, useAuthStore, useBookingStore, useWishlistStore } from '../store'
 import { BookingCard, HotelCard } from '../components/cards'
 import { Breadcrumb } from '../components/ui'
-import { formatCurrency } from '../utils'
 import toast from 'react-hot-toast'
 
 const tabs = [

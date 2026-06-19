@@ -1,8 +1,8 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Star, MapPin, Check, X, Share2, Heart, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useThemeStore, useWishlistStore, useBookingStore } from '../store'
+import { Star, MapPin, Check, Share2, Heart, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useThemeStore, useWishlistStore } from '../store'
 import { useHotel } from '../hooks/useQueries'
 import { HotelCard, ReviewCard, RoomCard } from '../components/cards'
 import { SkeletonHotelDetail, Rating } from '../components/ui'
@@ -12,10 +12,8 @@ import toast from 'react-hot-toast'
 
 export default function HotelDetailsPage() {
   const { id } = useParams()
-  const navigate = useNavigate()
   const { theme } = useThemeStore()
   const { isInWishlist, toggleItem } = useWishlistStore()
-  const { setCurrentBooking } = useBookingStore()
   const isDark = theme === 'dark'
   const { data: hotel, isLoading } = useHotel(id)
   const [selectedImage, setSelectedImage] = useState(0)
@@ -23,12 +21,6 @@ export default function HotelDetailsPage() {
 
   if (isLoading) return <div className="max-w-7xl mx-auto px-4 py-8"><SkeletonHotelDetail /></div>
   if (!hotel) return <div className="text-center py-20"><h2 className="text-2xl font-bold">Hotel not found</h2></div>
-
-  const handleBookRoom = (room) => {
-    if (!room.available) return
-    setCurrentBooking({ hotel, room, hotelName: hotel.name, hotelImage: hotel.images[0], currency: hotel.currency })
-    navigate('/booking')
-  }
 
   const handleShare = () => {
     if (navigator.share) {

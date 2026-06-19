@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,7 +7,6 @@ import { Calendar, Users, Edit3 } from 'lucide-react'
 import { useThemeStore, useBookingStore } from '../store'
 import { Breadcrumb } from '../components/ui'
 import { formatCurrency, formatDate, calculateTotal } from '../utils'
-import toast from 'react-hot-toast'
 
 const bookingSchema = z.object({
   name: z.string().min(2, 'Name is required'),
