@@ -51,8 +51,8 @@ export default function BookingPage() {
     : 1
 
   const price = currentBooking?.room?.price || currentBooking?.hotel?.price || 0
-  const discount = currentBooking?.hotel?.discount || 0
-  const { subtotal, tax, total } = calculateTotal(price, nights, 0.12, discount)
+  const discountPercent = currentBooking?.hotel?.discount || 0
+  const { subtotal, tax, discount: discountAmount, total } = calculateTotal(price, nights, 0.12, discountPercent)
   const currency = currentBooking?.currency || 'USD'
 
   const onSubmit = (data) => {
@@ -62,7 +62,7 @@ export default function BookingPage() {
       nights,
       subtotal,
       tax,
-      discount,
+      discount: discountAmount,
       total,
       currency,
       roomType: currentBooking?.room?.type || 'Standard',
@@ -217,10 +217,10 @@ export default function BookingPage() {
                   <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Tax (12%)</span>
                   <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{formatCurrency(tax, currency)}</span>
                 </div>
-                {discount > 0 && (
+                {discountAmount > 0 && (
                   <div className="flex justify-between text-sm text-green-500">
-                    <span>Discount ({discount}%)</span>
-                    <span>-{formatCurrency(discount, currency)}</span>
+                    <span>Discount ({discountPercent}%)</span>
+                    <span>-{formatCurrency(discountAmount, currency)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-100 dark:border-dark-border">

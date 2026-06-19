@@ -39,7 +39,10 @@ export const hotelApi = {
     await delay(200)
     const hotel = hotels.find((h) => h.id === Number(id))
     if (!hotel) throw new Error('Hotel not found')
-    return hotel
+    const similarHotels = hotels
+      .filter((h) => h.id !== hotel.id && (h.city === hotel.city || h.country === hotel.country || h.stars === hotel.stars))
+      .slice(0, 3)
+    return { ...hotel, similarHotels }
   },
 
   getFeatured: async () => {

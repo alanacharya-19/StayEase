@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Users, Bed, Check, X, Calendar } from 'lucide-react'
 import { useThemeStore, useBookingStore } from '../store'
