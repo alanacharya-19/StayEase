@@ -81,27 +81,4 @@ export const useRecentStore = create(
   )
 )
 
-export const useHotelStore = create((set) => ({
-  searchQuery: '',
-  filters: {
-    city: '',
-    country: '',
-    checkIn: '',
-    checkOut: '',
-    guests: 1,
-    priceMin: 0,
-    priceMax: 10000,
-    stars: 0,
-    amenities: [],
-  },
-  sortBy: 'popularity-desc',
-  setSearchQuery: (query) => set({ searchQuery: query }),
-  setFilters: (filters) => set({ filters: { ...filters } }),
-  updateFilter: (key, value) =>
-    set((state) => ({ filters: { ...state.filters, [key]: value } })),
-  resetFilters: () =>
-    set({
-      filters: { city: '', country: '', checkIn: '', checkOut: '', guests: 1, priceMin: 0, priceMax: 10000, stars: 0, amenities: [] },
-    }),
-  setSortBy: (sortBy) => set({ sortBy }),
-}))
+

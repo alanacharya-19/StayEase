@@ -1,5 +1,3 @@
-export const countries = ['USA', 'UK', 'France', 'Japan', 'UAE', 'Indonesia', 'Australia', 'Italy', 'Spain', 'Germany', 'Canada', 'Thailand']
-export const cities = ['New York', 'London', 'Paris', 'Tokyo', 'Dubai', 'Miami', 'Denver', 'Sydney', 'Rome', 'Ubud', 'Barcelona', 'Berlin', 'Toronto', 'Bangkok']
 export const amenitiesList = ['Free WiFi', 'Pool', 'Spa', 'Gym', 'Restaurant', 'Bar', 'Room Service', 'Parking', 'Beach Access', 'Airport Shuttle', 'Business Center', 'Kids Club', 'Pet Friendly', 'Air Conditioning', 'Heating', 'Kitchen', 'Balcony', 'Garden View']
 export const sortOptions = [
   { value: 'price-asc', label: 'Lowest Price' },
