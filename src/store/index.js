@@ -49,13 +49,19 @@ export const useWishlistStore = create(
 
 export const useBookingStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       currentBooking: null,
       bookingHistory: [],
       setCurrentBooking: (booking) => set({ currentBooking: booking }),
       addToHistory: (booking) =>
         set((state) => ({ bookingHistory: [booking, ...state.bookingHistory], currentBooking: null })),
       clearCurrentBooking: () => set({ currentBooking: null }),
+      cancelBooking: (bookingId) =>
+        set((state) => ({
+          bookingHistory: state.bookingHistory.map((b) =>
+            b.id === bookingId ? { ...b, status: 'cancelled' } : b
+          ),
+        })),
     }),
     { name: 'stayease-booking' }
   )

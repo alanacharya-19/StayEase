@@ -43,7 +43,7 @@ export default function DashboardPage() {
     toast.success('Profile updated!')
   }
 
-  const upcomingTrips = bookingHistory.filter(b => new Date(b.checkIn) > new Date())
+  const upcomingTrips = bookingHistory.filter(b => new Date(b.checkIn) > new Date() && b.status !== 'cancelled')
 
   const renderContent = () => {
     switch (activeTab) {
