@@ -21,10 +21,8 @@ export default function HotelDetailsPage() {
 
   const { addItem } = useRecentStore()
 
-  if (isLoading) return <div className="max-w-7xl mx-auto px-4 py-8"><SkeletonHotelDetail /></div>
-  if (!hotel) return <div className="text-center py-20"><h2 className="text-2xl font-bold">Hotel not found</h2></div>
-
   useEffect(() => {
+    if (!hotel) return
     addItem({
       id: hotel.id,
       name: hotel.name,
@@ -36,7 +34,10 @@ export default function HotelDetailsPage() {
       stars: hotel.stars,
       image: hotel.images[0],
     })
-  }, [hotel.id])
+  }, [hotel?.id])
+
+  if (isLoading) return <div className="max-w-7xl mx-auto px-4 py-8"><SkeletonHotelDetail /></div>
+  if (!hotel) return <div className="text-center py-20"><h2 className="text-2xl font-bold">Hotel not found</h2></div>
 
   const handleShare = () => {
     if (navigator.share) {
