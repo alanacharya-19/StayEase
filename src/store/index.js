@@ -61,6 +61,20 @@ export const useBookingStore = create(
   )
 )
 
+export const useRecentStore = create(
+  persist(
+    (set, get) => ({
+      items: [],
+      addItem: (hotel) => {
+        const filtered = get().items.filter((i) => i.id !== hotel.id)
+        set({ items: [hotel, ...filtered].slice(0, 5) })
+      },
+      clearItems: () => set({ items: [] }),
+    }),
+    { name: 'stayease-recent' }
+  )
+)
+
 export const useHotelStore = create((set) => ({
   searchQuery: '',
   filters: {

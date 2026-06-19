@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { useThemeStore } from '../store'
 import { useFeaturedHotels, usePopularHotels, useLuxuryHotels, useBudgetHotels } from '../hooks/useQueries'
 import { popularDestinations, testimonials, faqs } from '../data/hotels'
-import { HotelCard } from '../components/cards'
+import { HotelCard, RecentlyViewed } from '../components/cards'
 import { SkeletonList } from '../components/ui'
 import SearchBar from '../components/forms/SearchBar'
 
@@ -171,6 +171,9 @@ export default function LandingPage() {
           )}
         </div>
       </section>
+
+      {/* Recently Viewed */}
+      <RecentlyViewed />
 
       {/* Luxury Hotels */}
       <section className="py-16 lg:py-24">

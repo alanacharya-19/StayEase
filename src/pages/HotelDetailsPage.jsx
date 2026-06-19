@@ -1,8 +1,8 @@
 import { useParams, Link } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Star, MapPin, Check, Share2, Heart, ChevronLeft, ChevronRight } from 'lucide-react'
-import { useThemeStore, useWishlistStore } from '../store'
+import { useThemeStore, useWishlistStore, useRecentStore } from '../store'
 import { useHotel } from '../hooks/useQueries'
 import { HotelCard, ReviewCard, RoomCard } from '../components/cards'
 import { SkeletonHotelDetail, Rating } from '../components/ui'
@@ -19,8 +19,24 @@ export default function HotelDetailsPage() {
   const [selectedImage, setSelectedImage] = useState(0)
   const [showAllAmenities, setShowAllAmenities] = useState(false)
 
+  const { addItem } = useRecentStore()
+
   if (isLoading) return <div className="max-w-7xl mx-auto px-4 py-8"><SkeletonHotelDetail /></div>
   if (!hotel) return <div className="text-center py-20"><h2 className="text-2xl font-bold">Hotel not found</h2></div>
+
+  useEffect(() => {
+    addItem({
+      id: hotel.id,
+      name: hotel.name,
+      city: hotel.city,
+      country: hotel.country,
+      price: hotel.price,
+      currency: hotel.currency,
+      rating: hotel.rating,
+      stars: hotel.stars,
+      image: hotel.images[0],
+    })
+  }, [hotel.id])
 
   const handleShare = () => {
     if (navigator.share) {
