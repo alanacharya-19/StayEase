@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
-import { Loader } from '../components/ui'
+import { Loader, ErrorBoundary } from '../components/ui'
 
 const LandingPage = lazy(() => import('../pages/LandingPage'))
 const HotelsPage = lazy(() => import('../pages/HotelsPage'))
@@ -20,8 +20,9 @@ const ErrorPage = lazy(() => import('../pages/ErrorPage'))
 
 export default function AppRoutes() {
   return (
-    <Suspense fallback={<Loader fullScreen />}>
-      <Routes>
+    <ErrorBoundary>
+      <Suspense fallback={<Loader fullScreen />}>
+        <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/hotels" element={<HotelsPage />} />
@@ -40,5 +41,6 @@ export default function AppRoutes() {
         </Route>
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   )
 }
