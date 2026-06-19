@@ -24,7 +24,7 @@ export const hotelApi = {
       switch (params.sort) {
         case 'price-asc': result.sort((a, b) => a.price - b.price); break
         case 'price-desc': result.sort((a, b) => b.price - a.price); break
-        case 'rating-desc': result.sort((a, b) => b.rating - a.rating); break
+        case 'rating-desc': result.sort((a, b) => b.ratings.overall - a.ratings.overall); break
         case 'popularity-desc': result.sort((a, b) => b.reviewsCount - a.reviewsCount); break
       }
     }

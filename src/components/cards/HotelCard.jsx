@@ -87,7 +87,7 @@ export default function HotelCard({ hotel, index = 0 }) {
             </h3>
             <div className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-lg text-xs font-semibold shrink-0">
               <Star size={12} fill="currentColor" />
-              <span>{hotel.rating}</span>
+              <span>{hotel.ratings?.overall || hotel.rating}</span>
             </div>
           </div>
 

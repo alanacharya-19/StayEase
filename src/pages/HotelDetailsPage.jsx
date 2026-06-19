@@ -32,7 +32,7 @@ export default function HotelDetailsPage() {
       country: hotel.country,
       price: hotel.price,
       currency: hotel.currency,
-      rating: hotel.rating,
+      rating: hotel.ratings.overall,
       stars: hotel.stars,
       image: hotel.images[0],
     })
@@ -113,7 +113,7 @@ export default function HotelDetailsPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 bg-primary/10 px-3 py-2 rounded-xl">
-                  <Rating value={hotel.rating} size={14} />
+                  <Rating value={hotel.ratings.overall} size={14} />
                   <span className="text-sm text-gray-500">({hotel.reviewsCount} reviews)</span>
                 </div>
               </div>
@@ -196,10 +196,36 @@ export default function HotelDetailsPage() {
                   Guest Reviews
                 </h2>
                 <div className="flex items-center gap-2">
-                  <Rating value={hotel.rating} size={14} />
-                  <span className="text-2xl font-bold text-primary">{hotel.rating}</span>
+                  <Rating value={hotel.ratings.overall} size={14} />
+                  <span className="text-2xl font-bold text-primary">{hotel.ratings.overall}</span>
                 </div>
               </div>
+
+              {/* Rating Breakdown */}
+              <div className={`grid grid-cols-2 gap-3 mb-6 p-4 rounded-xl ${isDark ? 'bg-dark-border/50' : 'bg-gray-50'}`}>
+                {[
+                  { label: 'Cleanliness', value: hotel.ratings.cleanliness },
+                  { label: 'Location', value: hotel.ratings.location },
+                  { label: 'Service', value: hotel.ratings.service },
+                  { label: 'Value for Money', value: hotel.ratings.value },
+                ].map((item) => (
+                  <div key={item.label}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{item.label}</span>
+                      <span className="text-xs font-semibold text-primary">{item.value.toFixed(1)}</span>
+                    </div>
+                    <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-dark-border' : 'bg-gray-200'}`}>
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${(item.value / 5) * 100}%` }}
+                        viewport={{ once: true }}
+                        className="h-full rounded-full bg-primary"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {hotel.reviews.map((review) => (
                   <ReviewCard key={review.id} review={review} />
