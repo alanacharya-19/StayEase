@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, Star, Shield, Headphones, CreditCard, ChevronDown } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import toast from 'react-hot-toast'
 import { useThemeStore } from '../store'
 import { useFeaturedHotels, usePopularHotels, useLuxuryHotels, useBudgetHotels } from '../hooks/useQueries'
@@ -31,10 +31,10 @@ export default function LandingPage() {
   const { data: popular } = usePopularHotels()
   const { data: luxury } = useLuxuryHotels()
   const { data: budget } = useBudgetHotels()
-  const [openFaq, setOpenFaq] = useState(null)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [email, setEmail] = useState('')
 
-  const handleNewsletter = (e) => {
+  const handleNewsletter = (e: FormEvent) => {
     e.preventDefault()
     if (email) toast.success('Subscribed successfully!')
   }

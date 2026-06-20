@@ -30,7 +30,7 @@ export default function RegisterPage() {
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   })
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: { name: string; email: string; password: string; confirmPassword: string }) => {
     try {
       const res = await registerApi(data)
       registerUser(res.user)

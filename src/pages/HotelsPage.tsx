@@ -61,7 +61,7 @@ export default function HotelsPage() {
     setSearchParams(params, { replace: true })
   }, [searchQuery, filters, sortBy, page])
 
-  const toggleAmenity = (amenity) => {
+  const toggleAmenity = (amenity: string) => {
     setFilters((prev) => ({
       ...prev,
       amenities: prev.amenities.includes(amenity)
@@ -78,7 +78,7 @@ export default function HotelsPage() {
     setPage(1)
   }
 
-  const hasFilters = Object.values(filters).some((v) => v !== '' && v !== 0 && (Array.isArray(v) ? v.length > 0 : true))
+  const hasFilters = Object.values(filters).some((v) => v !== '' && (Array.isArray(v) ? v.length > 0 : true))
 
   return (
     <div className="py-8 lg:py-12">
@@ -211,7 +211,7 @@ export default function HotelsPage() {
           <div className="flex-1 min-w-0">
             {isLoading ? (
               <SkeletonList count={6} />
-            ) : data?.data?.length > 0 ? (
+            ) : data && data.data && data.data.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                   {data.data.map((hotel, i) => (

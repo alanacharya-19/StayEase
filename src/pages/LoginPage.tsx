@@ -8,6 +8,7 @@ import { Eye, EyeOff, LogIn } from 'lucide-react'
 import { useThemeStore, useAuthStore } from '../store'
 import { useLogin } from '../hooks/useQueries'
 import toast from 'react-hot-toast'
+import type { AuthResponse } from '../types'
 
 const loginSchema = z.object({
   email: z.string().email('Valid email is required'),
@@ -28,7 +29,7 @@ export default function LoginPage() {
     defaultValues: { email: '', password: '', remember: false },
   })
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: { email: string; password: string; remember?: boolean }) => {
     try {
       const res = await loginApi(data)
       login(res.user)

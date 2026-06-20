@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Star, MapPin, Check, Share2, Heart, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Star, MapPin, Check, X, Share2, Heart, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useThemeStore, useWishlistStore, useRecentStore } from '../store'
 import { useHotel } from '../hooks/useQueries'
 import { HotelCard, ReviewCard, RoomCard } from '../components/cards'
@@ -283,7 +283,7 @@ export default function HotelDetailsPage() {
         </div>
 
         {/* Similar Hotels */}
-        {hotel.similarHotels?.length > 0 && (
+        {hotel.similarHotels && hotel.similarHotels.length > 0 && (
           <section className="mt-12">
             <h2 className={`text-xl font-semibold mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>Similar Hotels</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

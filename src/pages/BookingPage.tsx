@@ -194,7 +194,7 @@ export default function BookingPage() {
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Users size={14} className="text-gray-400" />
-                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{watchGuests || 1} Guest{(watchGuests || 1) > 1 ? 's' : ''}</span>
+                  <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>{watchGuests || 1} Guest{Number(watchGuests || 1) > 1 ? 's' : ''}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Edit3 size={14} className="text-gray-400" />
