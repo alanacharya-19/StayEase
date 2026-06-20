@@ -2,7 +2,7 @@
 
 A modern, production-quality hotel booking website built with React 19, Vite, Tailwind CSS, and cutting-edge frontend technologies.
 
-<img src="./public/images/image.png" width="150" />
+<img src="./public/images/image.png" />
 
 ## 🚀 Tech Stack
 
