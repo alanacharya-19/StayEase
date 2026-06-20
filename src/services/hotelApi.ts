@@ -1,6 +1,6 @@
 import api from './api'
 import { hotels as fallbackHotels } from '../data/hotels'
-import { findHotelId, findCityId, getHotelsByCity, getHotelPrices } from './makcorpsApi'
+import { findCityId, getHotelsByCity, getHotelPrices, findHotelId } from './makcorpsApi'
 import type { Hotel, HotelQueryParams, PaginatedResponse, VendorPrice } from '../types'
 import type { MakcorpsCityHotel } from './makcorpsApi'
 
@@ -16,56 +16,118 @@ type HotelApi = {
 
 const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
 
-function matchByName(mockHotel: Hotel, makcorpsHotels: MakcorpsCityHotel[]): MakcorpsCityHotel | undefined {
-  const normalized = mockHotel.name.toLowerCase()
-  return makcorpsHotels.find((mh) => normalized.includes(mh.name.toLowerCase()) || mh.name.toLowerCase().includes(normalized))
+const CITIES: Array<{ name: string; country: string }> = [
+  { name: 'New York', country: 'USA' },
+  { name: 'Paris', country: 'France' },
+  { name: 'Dubai', country: 'UAE' },
+  { name: 'Tokyo', country: 'Japan' },
+  { name: 'London', country: 'UK' },
+  { name: 'Bali', country: 'Indonesia' },
+  { name: 'Rome', country: 'Italy' },
+  { name: 'Barcelona', country: 'Spain' },
+  { name: 'Singapore', country: 'Singapore' },
+  { name: 'Sydney', country: 'Australia' },
+]
+
+const CITY_IMAGES: Record<string, string[]> = {
+  'New York': [
+    'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800',
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+    'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800',
+  ],
+  'Paris': [
+    'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800',
+    'https://images.unsplash.com/photo-1550340499-a6c60fc8287c?w=800',
+  ],
+  'Dubai': [
+    'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800',
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
+  ],
+  'Tokyo': [
+    'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800',
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800',
+  ],
+  'London': [
+    'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800',
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+  ],
+  'Bali': [
+    'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800',
+    'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800',
+  ],
+  'Rome': [
+    'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800',
+    'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800',
+  ],
+  'Barcelona': [
+    'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800',
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+  ],
+  'Singapore': [
+    'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800',
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+  ],
+  'Sydney': [
+    'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800',
+    'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+  ],
 }
 
-async function enrichWithMakcorpsPrices(hotelList: Hotel[], params: HotelQueryParams = {}): Promise<Hotel[]> {
-  if (!import.meta.env.VITE_MAKCORPS_API_KEY || hotelList.length === 0) return hotelList
-  const enriched = [...hotelList]
-  try {
-    const uniqueCities = [...new Set(enriched.map((h) => h.city))]
-    const cityIds = await Promise.allSettled(uniqueCities.map(findCityId))
-    const makcorpsParams: { checkin?: string; checkout?: string; rooms: number; adults: number } = {
-      checkin: params.checkIn,
-      checkout: params.checkOut,
-      rooms: 1,
-      adults: params.guests ? Number(params.guests) : 2,
-    }
-    const cityResults = await Promise.allSettled(
-      cityIds.map((c) => {
-        if (c.status !== 'fulfilled' || !c.value) return Promise.resolve([] as MakcorpsCityHotel[])
-        return getHotelsByCity(c.value, makcorpsParams)
-      })
-    )
-    const cityToMakcorps: Record<string, MakcorpsCityHotel[]> = {}
-    uniqueCities.forEach((city, i) => {
-      if (cityResults[i].status === 'fulfilled') {
-        cityToMakcorps[city] = cityResults[i].value as MakcorpsCityHotel[]
-      }
-    })
-    for (let i = 0; i < enriched.length; i++) {
-      const makHotels = cityToMakcorps[enriched[i].city]
-      if (makHotels && makHotels.length > 0) {
-        const match = matchByName(enriched[i], makHotels)
-        if (match && match.price > 0) {
-          enriched[i] = { ...enriched[i], price: match.price, makcorpsPrice: match.price }
-        }
-      }
-    }
-  } catch {
-    // fall back to mock prices
-  }
-  return enriched
+const STAR_AMENITIES: Record<number, string[]> = {
+  5: ['Free WiFi', 'Pool', 'Spa', 'Gym', 'Restaurant', 'Bar', 'Room Service', 'Parking', 'Concierge', 'Laundry', 'Business Center', 'Kids Club'],
+  4: ['Free WiFi', 'Pool', 'Gym', 'Restaurant', 'Bar', 'Room Service', 'Parking', 'Laundry', 'Business Center'],
+  3: ['Free WiFi', 'Restaurant', 'Bar', 'Room Service', 'Parking', 'Laundry'],
+  2: ['Free WiFi', 'Restaurant', 'Laundry'],
 }
 
-async function tryApiHotels(fallback: () => Hotel[]): Promise<Hotel[]> {
-  try {
-    const { data } = await api.get('/hotels')
-    return Array.isArray(data) ? data : (data.data ?? data.hotels ?? fallback())
-  } catch {
-    return fallback()
+function generateHotel(m: MakcorpsCityHotel, city: string, country: string, idx: number): Hotel {
+  const id = idx + 1
+  const stars = m.rating ? Math.min(5, Math.max(1, Math.round(m.rating / 2))) : 4
+  const images = CITY_IMAGES[city] || CITY_IMAGES['New York']
+  return {
+    id,
+    name: m.name,
+    description: `Experience ${m.name} in the heart of ${city}. Book your stay with StayEase for the best rates and exceptional service.`,
+    longDescription: `Welcome to ${m.name}, a premier hotel located in beautiful ${city}, ${country}. Our dedicated team ensures a memorable stay with top-notch hospitality and comfort.`,
+    city,
+    country,
+    images,
+    ratings: {
+      overall: m.rating || 4.0,
+      cleanliness: (m.rating || 4.0) - 0.1,
+      location: (m.rating || 4.0) + 0.2,
+      service: (m.rating || 4.0) - 0.05,
+      value: (m.rating || 4.0) - 0.2,
+    },
+    reviewsCount: m.reviewsCount || Math.floor(Math.random() * 500) + 50,
+    stars,
+    price: m.price,
+    currency: 'USD',
+    amenities: STAR_AMENITIES[stars as keyof typeof STAR_AMENITIES] || STAR_AMENITIES[3],
+    policies: {
+      checkIn: '2:00 PM',
+      checkOut: '11:00 AM',
+      cancellation: 'Free cancellation up to 48 hours before check-in',
+      children: 'Children welcome',
+      pets: 'Pets allowed with prior notice',
+    },
+    location: {
+      lat: 0,
+      lng: 0,
+      address: `${city}, ${country}`,
+    },
+    rooms: [
+      { id: 1, type: 'Standard Room', bed: 'Queen', capacity: 2, price: m.price, images, facilities: ['WiFi', 'TV', 'Air Conditioning'], available: true, cancellationPolicy: 'Free cancellation 24h before' },
+      { id: 2, type: 'Deluxe Room', bed: 'King', capacity: 3, price: Math.round(m.price * 1.4), images, facilities: ['WiFi', 'TV', 'Air Conditioning', 'Mini Bar'], available: true, cancellationPolicy: 'Free cancellation 48h before' },
+      { id: 3, type: 'Suite', bed: 'King', capacity: 4, price: Math.round(m.price * 2), images, facilities: ['WiFi', 'TV', 'Air Conditioning', 'Mini Bar', 'Living Area'], available: true, cancellationPolicy: 'Free cancellation 72h before' },
+    ],
+    reviews: [],
+    popular: m.rating !== null && m.rating >= 4.0,
+    featured: m.rating !== null && m.rating >= 4.5,
+    luxury: stars >= 5,
+    budget: stars <= 2,
+    discount: Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0,
+    makcorpsPrice: m.price,
   }
 }
 
@@ -83,8 +145,8 @@ function filterHotels(hotels: Hotel[], params: HotelQueryParams): Hotel[] {
     const q = params.search.toLowerCase()
     result = result.filter((h) => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q) || h.country.toLowerCase().includes(q))
   }
-  if (params.city) { const city = params.city; result = result.filter((h) => h.city.toLowerCase() === city.toLowerCase()) }
-  if (params.country) { const country = params.country; result = result.filter((h) => h.country.toLowerCase() === country.toLowerCase()) }
+  if (params.city) result = result.filter((h) => h.city.toLowerCase() === params.city!.toLowerCase())
+  if (params.country) result = result.filter((h) => h.country.toLowerCase() === params.country!.toLowerCase())
   if (params.priceMin) result = result.filter((h) => h.price >= Number(params.priceMin))
   if (params.priceMax) result = result.filter((h) => h.price <= Number(params.priceMax))
   if (params.stars) result = result.filter((h) => h.stars >= Number(params.stars))
@@ -96,84 +158,138 @@ function filterHotels(hotels: Hotel[], params: HotelQueryParams): Hotel[] {
 }
 
 function sortHotels(result: Hotel[], sort?: string): Hotel[] {
-  if (!sort) return result
+  if (!sort || sort === 'popularity-desc') return result
+  const sorted = [...result]
   switch (sort) {
-    case 'price-asc': return result.sort((a, b) => a.price - b.price)
-    case 'price-desc': return result.sort((a, b) => b.price - a.price)
-    case 'rating-desc': return result.sort((a, b) => b.ratings.overall - a.ratings.overall)
-    case 'popularity-desc': return result.sort((a, b) => b.reviewsCount - a.reviewsCount)
-    default: return result
+    case 'price-asc': sorted.sort((a, b) => a.price - b.price); break
+    case 'price-desc': sorted.sort((a, b) => b.price - a.price); break
+    case 'rating-desc': sorted.sort((a, b) => b.ratings.overall - a.ratings.overall); break
   }
+  return sorted
+}
+
+async function fetchMakcorpsHotels(): Promise<Hotel[]> {
+  if (!import.meta.env.VITE_MAKCORPS_API_KEY) return []
+  const all: Hotel[] = []
+  let idCounter = 0
+  for (const c of CITIES) {
+    try {
+      const cityId = await findCityId(c.name)
+      if (!cityId) continue
+      const hotels = await getHotelsByCity(cityId)
+      for (const h of hotels) {
+        if (h.price > 0) {
+          all.push(generateHotel(h, c.name, c.country, idCounter))
+          idCounter++
+        }
+      }
+    } catch {
+      // skip this city
+    }
+  }
+  return all
+}
+
+async function getPrimaryHotels(): Promise<Hotel[]> {
+  // 1) Try real backend API
+  try {
+    const { data } = await api.get('/hotels')
+    const list = Array.isArray(data) ? data : (data.data ?? data.hotels ?? null)
+    if (list && list.length >= 5) return list
+  } catch {
+    // fall through
+  }
+  // 2) Try Makcorps API
+  const makcorps = await fetchMakcorpsHotels()
+  if (makcorps.length >= 5) return makcorps
+  // 3) Fall back to static data
+  return fallbackHotels
+}
+
+let cachedHotels: Hotel[] | null = null
+let cachePromise: Promise<Hotel[]> | null = null
+
+async function getCachedHotels(): Promise<Hotel[]> {
+  if (cachedHotels) return cachedHotels
+  if (cachePromise) return cachePromise
+  cachePromise = getPrimaryHotels().then((h) => {
+    cachedHotels = h
+    cachePromise = null
+    return h
+  })
+  return cachePromise
 }
 
 export const hotelApi: HotelApi = {
   getAll: async (params: HotelQueryParams = {}): Promise<PaginatedResponse> => {
     await delay(200)
-    const hotels = await tryApiHotels(() => fallbackHotels)
-    let result = filterHotels(hotels, params)
-    result = await enrichWithMakcorpsPrices(result, params)
-    result = sortHotels(result, params.sort)
+    const hotels = await getCachedHotels()
+    let result = sortHotels(filterHotels(hotels, params), params.sort)
     return paginate(result, params)
   },
 
   getById: async (id: string | number): Promise<Hotel> => {
     await delay(200)
+    // Try real API first
     try {
       const { data } = await api.get(`/hotels/${id}`)
-      return data
+      if (data) return data
     } catch {
-      const hotel = fallbackHotels.find((h) => h.id === Number(id))
-      if (!hotel) throw new Error('Hotel not found')
-      let vendorPrices: VendorPrice[] = []
-      try {
-        const makId = await findHotelId(hotel.name)
-        if (makId) {
-          vendorPrices = await getHotelPrices(makId)
-        }
-      } catch {
-        // fall back to mock
-      }
-      const similarHotels = fallbackHotels
-        .filter((h) => h.id !== hotel.id && (h.city === hotel.city || h.country === hotel.country || h.stars === hotel.stars))
-        .slice(0, 3)
-      return { ...hotel, similarHotels, vendorPrices }
+      // fall through
     }
+    const hotels = await getCachedHotels()
+    const hotel = hotels.find((h) => h.id === Number(id))
+    if (!hotel) throw new Error('Hotel not found')
+    let vendorPrices: VendorPrice[] = []
+    try {
+      const makId = await findHotelId(hotel.name)
+      if (makId) vendorPrices = await getHotelPrices(makId)
+    } catch {
+      // ignore
+    }
+    const similarHotels = hotels
+      .filter((h) => h.id !== hotel.id && (h.city === hotel.city || h.country === hotel.country || h.stars === hotel.stars))
+      .slice(0, 3)
+    return { ...hotel, similarHotels, vendorPrices }
   },
 
   getFeatured: async (): Promise<Hotel[]> => {
     await delay(200)
-    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.featured))
-    return enrichWithMakcorpsPrices(hotels)
+    const hotels = await getCachedHotels()
+    return hotels.filter((h) => h.featured)
   },
 
   getPopular: async (): Promise<Hotel[]> => {
     await delay(200)
-    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.popular))
-    return enrichWithMakcorpsPrices(hotels)
+    const hotels = await getCachedHotels()
+    return hotels.filter((h) => h.popular)
   },
 
   getLuxury: async (): Promise<Hotel[]> => {
     await delay(200)
-    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.luxury))
-    return enrichWithMakcorpsPrices(hotels)
+    const hotels = await getCachedHotels()
+    return hotels.filter((h) => h.luxury)
   },
 
   getBudget: async (): Promise<Hotel[]> => {
     await delay(200)
-    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.budget))
-    return enrichWithMakcorpsPrices(hotels)
+    const hotels = await getCachedHotels()
+    return hotels.filter((h) => h.budget)
   },
 
   search: async (query: string): Promise<Hotel[]> => {
     await delay(150)
     try {
       const { data } = await api.get('/hotels/search', { params: { q: query } })
-      return Array.isArray(data) ? data : (data.data ?? data.hotels ?? [])
+      const list = Array.isArray(data) ? data : (data.data ?? data.hotels ?? null)
+      if (list) return list.slice(0, 5)
     } catch {
-      const q = query.toLowerCase()
-      return fallbackHotels.filter(
-        (h) => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q) || h.country.toLowerCase().includes(q)
-      ).slice(0, 5)
+      // fall through
     }
+    const hotels = await getCachedHotels()
+    const q = query.toLowerCase()
+    return hotels.filter(
+      (h) => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q) || h.country.toLowerCase().includes(q)
+    ).slice(0, 5)
   },
 }
