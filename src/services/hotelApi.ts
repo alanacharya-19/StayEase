@@ -1,5 +1,4 @@
 import api from './api'
-import { hotels as fallbackHotels } from '../data/hotels'
 import { findCityId, getHotelsByCity, getHotelPrices, findHotelId } from './makcorpsApi'
 import type { Hotel, HotelQueryParams, PaginatedResponse, VendorPrice } from '../types'
 import type { MakcorpsCityHotel } from './makcorpsApi'
@@ -190,6 +189,54 @@ async function fetchMakcorpsHotels(): Promise<Hotel[]> {
   return all
 }
 
+const HOTEL_NAMES = ['Grand', 'Royal', 'Plaza', 'Regency', 'Palace', 'Continental', 'Majestic', 'Imperial', 'Parkside', 'Harbor View', 'Sunrise', 'Crown', 'Heritage', 'Metropolis', 'Skyline']
+const HOTEL_TYPES = ['Hotel', 'Resort', 'Suites', 'Inn', 'Lodge']
+
+function generateSyntheticHotels(): Hotel[] {
+  const all: Hotel[] = []
+  let id = 0
+  for (const c of CITIES) {
+    const images = CITY_IMAGES[c.name] || CITY_IMAGES['New York']
+    const count = 3 + Math.floor(Math.random() * 3)
+    for (let i = 0; i < count; i++) {
+      id++
+      const stars = 3 + Math.floor(Math.random() * 3)
+      const price = 80 + Math.floor(Math.random() * 300)
+      const name = `${HOTEL_NAMES[Math.floor(Math.random() * HOTEL_NAMES.length)]} ${c.name} ${HOTEL_TYPES[Math.floor(Math.random() * HOTEL_TYPES.length)]}`
+      const rating = 3.5 + Math.random() * 1.5
+      all.push({
+        id,
+        name,
+        description: `Experience ${name} in the heart of ${c.name}. Book your stay with StayEase for the best rates and exceptional service.`,
+        longDescription: `Welcome to ${name}, a premier hotel located in beautiful ${c.name}, ${c.country}. Our dedicated team ensures a memorable stay with top-notch hospitality and comfort.`,
+        city: c.name,
+        country: c.country,
+        images,
+        ratings: { overall: rating, cleanliness: rating - 0.1, location: rating + 0.2, service: rating - 0.05, value: rating - 0.2 },
+        reviewsCount: Math.floor(Math.random() * 500) + 50,
+        stars,
+        price,
+        currency: 'USD',
+        amenities: STAR_AMENITIES[stars as keyof typeof STAR_AMENITIES] || STAR_AMENITIES[3],
+        policies: { checkIn: '2:00 PM', checkOut: '11:00 AM', cancellation: 'Free cancellation up to 48 hours before check-in', children: 'Children welcome', pets: 'Pets allowed with prior notice' },
+        location: { lat: 0, lng: 0, address: `${c.name}, ${c.country}` },
+        rooms: [
+          { id: 1, type: 'Standard Room', bed: 'Queen', capacity: 2, price, images, facilities: ['WiFi', 'TV', 'Air Conditioning'], available: true, cancellationPolicy: 'Free cancellation 24h before' },
+          { id: 2, type: 'Deluxe Room', bed: 'King', capacity: 3, price: Math.round(price * 1.4), images, facilities: ['WiFi', 'TV', 'Air Conditioning', 'Mini Bar'], available: true, cancellationPolicy: 'Free cancellation 48h before' },
+          { id: 3, type: 'Suite', bed: 'King', capacity: 4, price: Math.round(price * 2), images, facilities: ['WiFi', 'TV', 'Air Conditioning', 'Mini Bar', 'Living Area'], available: true, cancellationPolicy: 'Free cancellation 72h before' },
+        ],
+        reviews: [],
+        popular: rating >= 4.0,
+        featured: rating >= 4.5,
+        luxury: stars >= 5,
+        budget: stars <= 2,
+        discount: Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0,
+      })
+    }
+  }
+  return all
+}
+
 async function getPrimaryHotels(): Promise<Hotel[]> {
   // 1) Try real backend API
   try {
@@ -202,8 +249,8 @@ async function getPrimaryHotels(): Promise<Hotel[]> {
   // 2) Try Makcorps API
   const makcorps = await fetchMakcorpsHotels()
   if (makcorps.length >= 5) return makcorps
-  // 3) Fall back to static data
-  return fallbackHotels
+  // 3) Synthetic fallback so app is always usable
+  return generateSyntheticHotels()
 }
 
 let cachedHotels: Hotel[] | null = null

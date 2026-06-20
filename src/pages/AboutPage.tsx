@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useThemeStore } from '../store'
-import { teamMembers } from '../data/hotels'
+import { teamMembers } from '../data/content'
 import { Breadcrumb } from '../components/ui'
 import { Target, Eye, Heart } from 'lucide-react'
 

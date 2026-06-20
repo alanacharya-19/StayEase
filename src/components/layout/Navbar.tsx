@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X, Moon, Sun, Heart, User, ChevronDown, Search } from 'lucide-react'
 import { useThemeStore, useAuthStore, useWishlistStore } from '../../store'
 import { useSearchSuggestions } from '../../hooks/useQueries'
+import AuthModal from '../auth/AuthModal'
 
 const navLinks: Array<{ to: string; label: string }> = [
   { to: '/', label: 'Home' },
@@ -21,6 +22,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const { data: suggestions } = useSearchSuggestions(searchTerm)
 
@@ -137,12 +139,12 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <Link
-                to="/login"
+              <button
+                onClick={() => setAuthModalOpen(true)}
                 className="hidden sm:flex items-center gap-2 px-4 py-2 gradient-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
               >
                 Sign In
-              </Link>
+              </button>
             )}
 
             <button
@@ -238,13 +240,12 @@ export default function Navbar() {
                 </Link>
               ))}
               {!isAuthenticated ? (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
+                <button
+                  onClick={() => { setMobileOpen(false); setAuthModalOpen(true) }}
                   className="block py-2 text-sm font-medium text-primary"
                 >
                   Sign In
-                </Link>
+                </button>
               ) : (
                 <>
                   <Link
@@ -266,6 +267,7 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </nav>
   )
 }
