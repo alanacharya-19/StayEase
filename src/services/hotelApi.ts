@@ -1,4 +1,5 @@
-import { hotels } from '../data/hotels'
+import api from './api'
+import { hotels as fallbackHotels } from '../data/hotels'
 import { findHotelId, findCityId, getHotelsByCity, getHotelPrices } from './makcorpsApi'
 import type { Hotel, HotelQueryParams, PaginatedResponse, VendorPrice } from '../types'
 import type { MakcorpsCityHotel } from './makcorpsApi'
@@ -59,91 +60,120 @@ async function enrichWithMakcorpsPrices(hotelList: Hotel[], params: HotelQueryPa
   return enriched
 }
 
+async function tryApiHotels(fallback: () => Hotel[]): Promise<Hotel[]> {
+  try {
+    const { data } = await api.get('/hotels')
+    return Array.isArray(data) ? data : (data.data ?? data.hotels ?? fallback())
+  } catch {
+    return fallback()
+  }
+}
+
+function paginate(result: Hotel[], params: HotelQueryParams): PaginatedResponse {
+  const page = Number(params.page) || 1
+  const limit = Number(params.limit) || 6
+  const total = result.length
+  const paginated = result.slice((page - 1) * limit, page * limit)
+  return { data: paginated, total, page, totalPages: Math.ceil(total / limit) }
+}
+
+function filterHotels(hotels: Hotel[], params: HotelQueryParams): Hotel[] {
+  let result = [...hotels]
+  if (params.search) {
+    const q = params.search.toLowerCase()
+    result = result.filter((h) => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q) || h.country.toLowerCase().includes(q))
+  }
+  if (params.city) { const city = params.city; result = result.filter((h) => h.city.toLowerCase() === city.toLowerCase()) }
+  if (params.country) { const country = params.country; result = result.filter((h) => h.country.toLowerCase() === country.toLowerCase()) }
+  if (params.priceMin) result = result.filter((h) => h.price >= Number(params.priceMin))
+  if (params.priceMax) result = result.filter((h) => h.price <= Number(params.priceMax))
+  if (params.stars) result = result.filter((h) => h.stars >= Number(params.stars))
+  if (params.amenities) {
+    const selected = Array.isArray(params.amenities) ? params.amenities : [params.amenities]
+    result = result.filter((h) => selected.every((a) => h.amenities.includes(a)))
+  }
+  return result
+}
+
+function sortHotels(result: Hotel[], sort?: string): Hotel[] {
+  if (!sort) return result
+  switch (sort) {
+    case 'price-asc': return result.sort((a, b) => a.price - b.price)
+    case 'price-desc': return result.sort((a, b) => b.price - a.price)
+    case 'rating-desc': return result.sort((a, b) => b.ratings.overall - a.ratings.overall)
+    case 'popularity-desc': return result.sort((a, b) => b.reviewsCount - a.reviewsCount)
+    default: return result
+  }
+}
+
 export const hotelApi: HotelApi = {
   getAll: async (params: HotelQueryParams = {}): Promise<PaginatedResponse> => {
-    await delay(300)
-    let result = [...hotels]
-    if (params.search) {
-      const q = params.search.toLowerCase()
-      result = result.filter((h) => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q) || h.country.toLowerCase().includes(q))
-    }
-    if (params.city) { const city = params.city; result = result.filter((h) => h.city.toLowerCase() === city.toLowerCase()) }
-    if (params.country) { const country = params.country; result = result.filter((h) => h.country.toLowerCase() === country.toLowerCase()) }
-    if (params.priceMin) result = result.filter((h) => h.price >= Number(params.priceMin))
-    if (params.priceMax) result = result.filter((h) => h.price <= Number(params.priceMax))
-    if (params.stars) result = result.filter((h) => h.stars >= Number(params.stars))
-    if (params.amenities) {
-      const selected = Array.isArray(params.amenities) ? params.amenities : [params.amenities]
-      result = result.filter((h) => selected.every((a) => h.amenities.includes(a)))
-    }
-    // Apply Makcorps prices before sorting
+    await delay(200)
+    const hotels = await tryApiHotels(() => fallbackHotels)
+    let result = filterHotels(hotels, params)
     result = await enrichWithMakcorpsPrices(result, params)
-    if (params.sort) {
-      switch (params.sort) {
-        case 'price-asc': result.sort((a, b) => a.price - b.price); break
-        case 'price-desc': result.sort((a, b) => b.price - a.price); break
-        case 'rating-desc': result.sort((a, b) => b.ratings.overall - a.ratings.overall); break
-        case 'popularity-desc': result.sort((a, b) => b.reviewsCount - a.reviewsCount); break
-      }
-    }
-    const page = Number(params.page) || 1
-    const limit = Number(params.limit) || 6
-    const total = result.length
-    const paginated = result.slice((page - 1) * limit, page * limit)
-    return { data: paginated, total, page, totalPages: Math.ceil(total / limit) }
+    result = sortHotels(result, params.sort)
+    return paginate(result, params)
   },
 
   getById: async (id: string | number): Promise<Hotel> => {
     await delay(200)
-    const hotel = hotels.find((h) => h.id === Number(id))
-    if (!hotel) throw new Error('Hotel not found')
-    let vendorPrices: VendorPrice[] = []
     try {
-      const makId = await findHotelId(hotel.name)
-      if (makId) {
-        vendorPrices = await getHotelPrices(makId)
-      }
+      const { data } = await api.get(`/hotels/${id}`)
+      return data
     } catch {
-      // fall back to mock
+      const hotel = fallbackHotels.find((h) => h.id === Number(id))
+      if (!hotel) throw new Error('Hotel not found')
+      let vendorPrices: VendorPrice[] = []
+      try {
+        const makId = await findHotelId(hotel.name)
+        if (makId) {
+          vendorPrices = await getHotelPrices(makId)
+        }
+      } catch {
+        // fall back to mock
+      }
+      const similarHotels = fallbackHotels
+        .filter((h) => h.id !== hotel.id && (h.city === hotel.city || h.country === hotel.country || h.stars === hotel.stars))
+        .slice(0, 3)
+      return { ...hotel, similarHotels, vendorPrices }
     }
-    const similarHotels = hotels
-      .filter((h) => h.id !== hotel.id && (h.city === hotel.city || h.country === hotel.country || h.stars === hotel.stars))
-      .slice(0, 3)
-    return { ...hotel, similarHotels, vendorPrices }
   },
 
   getFeatured: async (): Promise<Hotel[]> => {
     await delay(200)
-    const featured = hotels.filter((h) => h.featured)
-    return enrichWithMakcorpsPrices(featured)
+    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.featured))
+    return enrichWithMakcorpsPrices(hotels)
   },
 
   getPopular: async (): Promise<Hotel[]> => {
     await delay(200)
-    const popular = hotels.filter((h) => h.popular)
-    return enrichWithMakcorpsPrices(popular)
+    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.popular))
+    return enrichWithMakcorpsPrices(hotels)
   },
 
   getLuxury: async (): Promise<Hotel[]> => {
     await delay(200)
-    const luxury = hotels.filter((h) => h.luxury)
-    return enrichWithMakcorpsPrices(luxury)
+    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.luxury))
+    return enrichWithMakcorpsPrices(hotels)
   },
 
   getBudget: async (): Promise<Hotel[]> => {
     await delay(200)
-    const budget = hotels.filter((h) => h.budget)
-    return enrichWithMakcorpsPrices(budget)
+    const hotels = await tryApiHotels(() => fallbackHotels.filter((h) => h.budget))
+    return enrichWithMakcorpsPrices(hotels)
   },
 
   search: async (query: string): Promise<Hotel[]> => {
     await delay(150)
-    const q = query.toLowerCase()
-    return hotels.filter(
-      (h) =>
-        h.name.toLowerCase().includes(q) ||
-        h.city.toLowerCase().includes(q) ||
-        h.country.toLowerCase().includes(q)
-    ).slice(0, 5)
+    try {
+      const { data } = await api.get('/hotels/search', { params: { q: query } })
+      return Array.isArray(data) ? data : (data.data ?? data.hotels ?? [])
+    } catch {
+      const q = query.toLowerCase()
+      return fallbackHotels.filter(
+        (h) => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q) || h.country.toLowerCase().includes(q)
+      ).slice(0, 5)
+    }
   },
 }

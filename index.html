@@ -11,6 +11,17 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        var errDiv = document.getElementById('root');
+        if (errDiv) errDiv.innerHTML = '<div style="padding:20px;font-family:monospace;background:#fee;color:#c00;border:2px solid #c00;margin:20px;border-radius:8px"><h2>JavaScript Error</h2><p><b>' + msg + '</b></p><p>at ' + url + ':' + line + ':' + col + '</p><p>' + (error ? error.stack : '') + '</p></div>';
+        return true;
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        var errDiv = document.getElementById('root');
+        if (errDiv) errDiv.innerHTML = '<div style="padding:20px;font-family:monospace;background:#fee;color:#c00;border:2px solid #c00;margin:20px;border-radius:8px"><h2>Unhandled Promise Rejection</h2><p><b>' + (e.reason ? e.reason.message || e.reason : 'Unknown') + '</b></p><p>' + (e.reason ? e.reason.stack : '') + '</p></div>';
+      });
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

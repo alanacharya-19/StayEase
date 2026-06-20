@@ -14,14 +14,14 @@ const navLinks: Array<{ to: string; label: string }> = [
 
 export default function Navbar() {
   const { theme, toggleTheme } = useThemeStore()
-  const { isAuthenticated, user, logout } = useAuthStore()
+  const { user, isAuthenticated, logout } = useAuthStore()
   const { items } = useWishlistStore()
   const location = useLocation()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const { data: suggestions } = useSearchSuggestions(searchTerm)
 
   const isDark = theme === 'dark'
@@ -93,44 +93,54 @@ export default function Navbar() {
             </Link>
 
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="relative hidden sm:block">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
+                  onBlur={() => setTimeout(() => setShowUserMenu(false), 200)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                    isDark ? 'hover:bg-dark-border' : 'hover:bg-gray-100'
+                    isDark ? 'hover:bg-dark-border text-gray-300' : 'hover:bg-gray-100 text-gray-700'
                   }`}
                 >
-                  <div className="w-7 h-7 gradient-primary rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs font-medium">
-                      {user?.name?.charAt(0) || 'U'}
-                    </span>
-                  </div>
-                  <span className={`text-sm font-medium hidden sm:block ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {user?.name?.split(' ')[0] || 'User'}
-                  </span>
-                  <ChevronDown size={14} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
+                  <User size={18} />
+                  <span className="text-sm font-medium max-w-[120px] truncate">{user?.name || user?.email}</span>
+                  <ChevronDown size={14} className={`transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
                 </button>
-                {showUserMenu && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setShowUserMenu(false)} />
-                    <div className={`absolute right-0 mt-2 w-48 rounded-xl shadow-lg py-1 z-20 ${
-                      isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'
-                    }`}>
-                      <Link to="/dashboard" className={`block px-4 py-2 text-sm ${isDark ? 'text-gray-300 hover:bg-dark-border' : 'text-gray-700 hover:bg-gray-50'}`}>Dashboard</Link>
-                      <Link to="/dashboard?tab=bookings" className={`block px-4 py-2 text-sm ${isDark ? 'text-gray-300 hover:bg-dark-border' : 'text-gray-700 hover:bg-gray-50'}`}>My Bookings</Link>
-                      <Link to="/wishlist" className={`block px-4 py-2 text-sm ${isDark ? 'text-gray-300 hover:bg-dark-border' : 'text-gray-700 hover:bg-gray-50'}`}>Wishlist</Link>
-                      <hr className={isDark ? 'border-dark-border' : 'border-gray-100'} />
-                      <button onClick={logout} className={`block w-full text-left px-4 py-2 text-sm text-red-500 ${isDark ? 'hover:bg-dark-border' : 'hover:bg-gray-50'}`}>Logout</button>
-                    </div>
-                  </>
-                )}
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      className={`absolute right-0 mt-2 w-48 rounded-xl shadow-lg overflow-hidden ${
+                        isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'
+                      }`}
+                    >
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setShowUserMenu(false)}
+                        className={`flex items-center gap-2 px-4 py-3 text-sm transition-colors ${
+                          isDark ? 'hover:bg-dark-border text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
+                      >
+                        Dashboard
+                      </Link>
+                      <button
+                        onClick={() => { logout(); setShowUserMenu(false); navigate('/') }}
+                        className={`w-full flex items-center gap-2 px-4 py-3 text-sm transition-colors ${
+                          isDark ? 'hover:bg-dark-border text-gray-300' : 'hover:bg-gray-50 text-gray-700'
+                        }`}
+                      >
+                        Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <Link
                 to="/login"
                 className="hidden sm:flex items-center gap-2 px-4 py-2 gradient-primary text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
               >
-                <User size={16} />
                 Sign In
               </Link>
             )}
@@ -227,7 +237,7 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              {!isAuthenticated && (
+              {!isAuthenticated ? (
                 <Link
                   to="/login"
                   onClick={() => setMobileOpen(false)}
@@ -235,11 +245,22 @@ export default function Navbar() {
                 >
                   Sign In
                 </Link>
-              )}
-              {isAuthenticated && (
-                <button onClick={() => { logout(); setMobileOpen(false) }} className="block py-2 text-sm font-medium text-red-500">
-                  Logout
-                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-2 text-sm font-medium text-primary"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setMobileOpen(false); navigate('/') }}
+                    className="block py-2 text-sm font-medium text-red-500"
+                  >
+                    Sign Out
+                  </button>
+                </>
               )}
             </div>
           </motion.div>

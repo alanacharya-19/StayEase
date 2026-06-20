@@ -32,6 +32,8 @@ export default function AppRoutes() {
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/sign-in/*" element={<LoginPage />} />
+          <Route path="/sign-up/*" element={<RegisterPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/about" element={<AboutPage />} />
