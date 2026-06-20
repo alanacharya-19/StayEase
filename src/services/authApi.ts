@@ -11,6 +11,19 @@ async function tryRealApi<T>(endpoint: string, body: unknown, mock: () => T): Pr
 }
 
 export const authApi = {
+  googleLogin: async (): Promise<AuthResponse> => {
+    try {
+      const { data } = await api.post('/auth/google')
+      return data
+    } catch {
+      await new Promise((r) => setTimeout(r, 500))
+      return {
+        user: { id: Date.now(), name: 'Google User', email: 'user@gmail.com', avatar: '' },
+        token: 'mock-google-jwt-' + Date.now(),
+      }
+    }
+  },
+
   login: async (credentials: { email: string; password: string }): Promise<AuthResponse> =>
     tryRealApi('/auth/login', credentials, () => ({
       user: { id: 1, name: 'John Doe', email: credentials.email, avatar: '' },

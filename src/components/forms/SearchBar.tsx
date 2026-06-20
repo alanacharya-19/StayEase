@@ -74,7 +74,7 @@ export default function SearchBar({ variant = 'hero' }: SearchBarProps) {
               type="date"
               value={query.checkIn}
               onChange={(e) => setQuery({ ...query, checkIn: e.target.value })}
-              className={`w-full lg:w-36 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-200 ${
+              className={`w-full lg:w-44 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-200 ${
                 isDark
                   ? 'bg-dark-border/80 text-white border border-transparent focus:border-primary/50 focus:bg-dark-border'
                   : 'bg-gray-100/80 text-gray-900 border border-transparent focus:border-primary/30 focus:bg-white'
@@ -90,7 +90,7 @@ export default function SearchBar({ variant = 'hero' }: SearchBarProps) {
               type="date"
               value={query.checkOut}
               onChange={(e) => setQuery({ ...query, checkOut: e.target.value })}
-              className={`w-full lg:w-36 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-200 ${
+              className={`w-full lg:w-44 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none transition-all duration-200 ${
                 isDark
                   ? 'bg-dark-border/80 text-white border border-transparent focus:border-primary/50 focus:bg-dark-border'
                   : 'bg-gray-100/80 text-gray-900 border border-transparent focus:border-primary/30 focus:bg-white'
@@ -105,7 +105,7 @@ export default function SearchBar({ variant = 'hero' }: SearchBarProps) {
             <select
               value={query.guests}
               onChange={(e) => setQuery({ ...query, guests: e.target.value })}
-              className={`w-full lg:w-28 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none appearance-none transition-all duration-200 ${
+              className={`w-full lg:w-32 pl-9 pr-3 py-2.5 rounded-lg text-sm outline-none appearance-none transition-all duration-200 ${
                 isDark
                   ? 'bg-dark-border/80 text-white border border-transparent focus:border-primary/50 focus:bg-dark-border'
                   : 'bg-gray-100/80 text-gray-900 border border-transparent focus:border-primary/30 focus:bg-white'
