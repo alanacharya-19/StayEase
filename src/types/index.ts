@@ -106,7 +106,7 @@ export interface TeamMember {
 }
 
 export interface User {
-  id: number
+  id: string | number
   name: string
   email: string
   phone?: string
