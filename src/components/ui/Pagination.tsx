@@ -32,9 +32,9 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
         page === '...' ? (
           <span key={`dots-${i}`} className="px-2 text-gray-400">...</span>
         ) : (
-          <button
+            <button
             key={page}
-            onClick={() => onPageChange(page)}
+            onClick={() => onPageChange(page as number)}
             className={`min-w-[36px] h-9 rounded-lg text-sm font-medium transition-all ${
               currentPage === page
                 ? 'gradient-primary text-white'

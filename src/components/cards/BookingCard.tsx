@@ -53,9 +53,9 @@ export default function BookingCard({ booking, index = 0 }: BookingCardProps) {
               <span className={`text-xs font-medium px-2.5 py-1 rounded-lg ${
                 booking.status === 'confirmed'
                   ? 'bg-green-500/10 text-green-500'
-                  : booking.status === 'pending'
-                  ? 'bg-yellow-500/10 text-yellow-500'
-                  : 'bg-red-500/10 text-red-500'
+                  : booking.status === 'cancelled'
+                  ? 'bg-red-500/10 text-red-500'
+                  : 'bg-yellow-500/10 text-yellow-500'
               }`}>
                 {booking.status}
               </span>
@@ -85,7 +85,7 @@ export default function BookingCard({ booking, index = 0 }: BookingCardProps) {
                   </button>
                 )}
                 <span className="font-bold text-primary">
-                  {formatCurrency(booking.total, booking.currency)}
+                  {formatCurrency(booking.total ?? 0, booking.currency)}
                 </span>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function BookingCard({ booking, index = 0 }: BookingCardProps) {
             </div>
             <div className="flex justify-between">
               <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Total</span>
-              <span className="font-semibold text-primary">{formatCurrency(booking.total, booking.currency)}</span>
+              <span className="font-semibold text-primary">{formatCurrency(booking.total ?? 0, booking.currency)}</span>
             </div>
           </div>
           <div className="flex gap-3 pt-2">

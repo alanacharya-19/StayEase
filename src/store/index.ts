@@ -27,10 +27,13 @@ interface WishlistState {
 }
 
 interface BookingState {
-  currentBooking: Record<string, unknown> | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  currentBooking: any | null
   bookingHistory: Booking[]
-  setCurrentBooking: (booking: Record<string, unknown>) => void
-  addToHistory: (booking: Booking) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setCurrentBooking: (booking: any) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addToHistory: (booking: any) => void
   clearCurrentBooking: () => void
   cancelBooking: (bookingId: string) => void
 }

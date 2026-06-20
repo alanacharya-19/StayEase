@@ -173,7 +173,7 @@ export default function Navbar() {
                   } border focus:border-primary`}
                   autoFocus
                 />
-                {suggestions?.length > 0 && (
+                {suggestions && suggestions.length > 0 && (
                   <div className={`absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg overflow-hidden ${
                     isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'
                   }`}>

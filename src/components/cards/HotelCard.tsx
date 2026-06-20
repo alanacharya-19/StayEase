@@ -17,14 +17,14 @@ export default function HotelCard({ hotel, index = 0 }: HotelCardProps) {
   const isDark = theme === 'dark'
   const inWishlist = isInWishlist(hotel.id)
 
-  const handleWishlist = (e) => {
+  const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     toggleItem(hotel)
     toast.success(inWishlist ? 'Removed from wishlist' : 'Added to wishlist')
   }
 
-  const handleShare = (e) => {
+  const handleShare = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (navigator.share) {

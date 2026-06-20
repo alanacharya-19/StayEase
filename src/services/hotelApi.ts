@@ -26,11 +26,11 @@ async function enrichWithMakcorpsPrices(hotelList: Hotel[], params: HotelQueryPa
   try {
     const uniqueCities = [...new Set(enriched.map((h) => h.city))]
     const cityIds = await Promise.allSettled(uniqueCities.map(findCityId))
-    const makcorpsParams = {
-      checkin: params.checkIn || params.checkin,
-      checkout: params.checkOut || params.checkout,
-      rooms: params.rooms || 1,
-      adults: params.adults || (params.guests ? Number(params.guests) : 2),
+    const makcorpsParams: { checkin?: string; checkout?: string; rooms: number; adults: number } = {
+      checkin: params.checkIn,
+      checkout: params.checkOut,
+      rooms: 1,
+      adults: params.guests ? Number(params.guests) : 2,
     }
     const cityResults = await Promise.allSettled(
       cityIds.map((c) => {
@@ -67,8 +67,8 @@ export const hotelApi: HotelApi = {
       const q = params.search.toLowerCase()
       result = result.filter((h) => h.name.toLowerCase().includes(q) || h.city.toLowerCase().includes(q) || h.country.toLowerCase().includes(q))
     }
-    if (params.city) result = result.filter((h) => h.city.toLowerCase() === params.city.toLowerCase())
-    if (params.country) result = result.filter((h) => h.country.toLowerCase() === params.country.toLowerCase())
+    if (params.city) { const city = params.city; result = result.filter((h) => h.city.toLowerCase() === city.toLowerCase()) }
+    if (params.country) { const country = params.country; result = result.filter((h) => h.country.toLowerCase() === country.toLowerCase()) }
     if (params.priceMin) result = result.filter((h) => h.price >= Number(params.priceMin))
     if (params.priceMax) result = result.filter((h) => h.price <= Number(params.priceMax))
     if (params.stars) result = result.filter((h) => h.stars >= Number(params.stars))

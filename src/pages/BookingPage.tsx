@@ -47,15 +47,17 @@ export default function BookingPage() {
   const watchGuests = watch('guests')
 
   const nights = watchCheckIn && watchCheckOut
-    ? Math.max(1, Math.ceil((new Date(watchCheckOut) - new Date(watchCheckIn)) / (1000 * 60 * 60 * 24)))
+    ? Math.max(1, Math.ceil((new Date(watchCheckOut).getTime() - new Date(watchCheckIn).getTime()) / (1000 * 60 * 60 * 24)))
     : 1
 
-  const price = currentBooking?.room?.price || currentBooking?.hotel?.price || 0
-  const discountPercent = currentBooking?.hotel?.discount || 0
+  const roomPrice: number = (currentBooking?.room as { price?: number })?.price ?? 0
+  const hotelPrice: number = (currentBooking?.hotel as { price?: number })?.price ?? 0
+  const price = roomPrice || hotelPrice
+  const discountPercent: number = (currentBooking?.hotel as { discount?: number })?.discount ?? 0
   const { subtotal, tax, discount: discountAmount, total } = calculateTotal(price, nights, 0.12, discountPercent)
-  const currency = currentBooking?.currency || 'USD'
+  const currency = (currentBooking?.currency as string) || 'USD'
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: Record<string, unknown>) => {
     const bookingData = {
       ...data,
       ...currentBooking,

@@ -11,7 +11,7 @@ export default function ImageCarousel({ images, className = '' }: ImageCarouselP
   const [current, setCurrent] = useState(0)
   const [direction, setDirection] = useState(0)
 
-  const slide = (dir) => {
+  const slide = (dir: number) => {
     setDirection(dir)
     setCurrent((prev) => {
       let next = prev + dir
@@ -22,9 +22,9 @@ export default function ImageCarousel({ images, className = '' }: ImageCarouselP
   }
 
   const variants = {
-    enter: (d) => ({ x: d > 0 ? 300 : -300, opacity: 0 }),
+    enter: (d: number) => ({ x: d > 0 ? 300 : -300, opacity: 0 }),
     center: { x: 0, opacity: 1 },
-    exit: (d) => ({ x: d > 0 ? -300 : 300, opacity: 0 }),
+    exit: (d: number) => ({ x: d > 0 ? -300 : 300, opacity: 0 }),
   }
 
   return (

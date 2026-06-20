@@ -27,7 +27,8 @@ export default function SearchBar({ variant = 'hero' }: SearchBarProps) {
     if (query.city) params.set('city', query.city)
     if (query.checkIn) params.set('checkIn', query.checkIn)
     if (query.checkOut) params.set('checkOut', query.checkOut)
-    if (query.guests > 1) params.set('guests', query.guests)
+    const guestNum = Number(query.guests)
+    if (guestNum > 1) params.set('guests', String(guestNum))
     navigate(`/hotels?${params.toString()}`)
   }
 
