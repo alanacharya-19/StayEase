@@ -1,7 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
+import type { ReactNode } from 'react'
 
-export default function Modal({ isOpen, onClose, title, children }) {
+interface ModalProps {
+  isOpen: boolean
+  onClose: () => void
+  title?: string
+  children: ReactNode
+}
+
+export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (

@@ -2,7 +2,16 @@ import { Link } from 'react-router-dom'
 import { ChevronRight, Home } from 'lucide-react'
 import { useThemeStore } from '../../store'
 
-export default function Breadcrumb({ items }) {
+interface BreadcrumbItem {
+  to?: string
+  label: string
+}
+
+interface BreadcrumbProps {
+  items: BreadcrumbItem[]
+}
+
+export default function Breadcrumb({ items }: BreadcrumbProps) {
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
 

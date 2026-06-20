@@ -7,8 +7,9 @@ import { Breadcrumb } from '../components/ui'
 import { formatCurrency } from '../utils'
 import toast from 'react-hot-toast'
 import { useCreateBooking } from '../hooks/useQueries'
+import type { FormEvent } from 'react'
 
-const paymentMethods = [
+const paymentMethods: Array<{ id: string; label: string; icon: React.ComponentType<{ size?: number }> }> = [
   { id: 'card', label: 'Credit Card', icon: CreditCard },
   { id: 'upi', label: 'UPI', icon: Smartphone },
   { id: 'paypal', label: 'PayPal', icon: Wallet },

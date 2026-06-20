@@ -34,7 +34,11 @@ export function SkeletonHotelDetail() {
   )
 }
 
-export function SkeletonList({ count = 6 }) {
+interface SkeletonListProps {
+  count?: number
+}
+
+export function SkeletonList({ count = 6 }: SkeletonListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {Array.from({ length: count }).map((_, i) => (

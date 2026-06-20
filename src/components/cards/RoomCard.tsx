@@ -3,8 +3,16 @@ import { motion } from 'framer-motion'
 import { Users, Bed, Check, X } from 'lucide-react'
 import { useThemeStore } from '../../store'
 import { formatCurrency } from '../../utils'
+import type { HotelRoom } from '../../types'
 
-export default function RoomCard({ room, hotelId, hotelName, index = 0 }) {
+interface RoomCardProps {
+  room: HotelRoom
+  hotelId: number
+  hotelName: string
+  index?: number
+}
+
+export default function RoomCard({ room, hotelId, hotelName, index = 0 }: RoomCardProps) {
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
 

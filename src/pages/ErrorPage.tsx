@@ -1,4 +1,4 @@
-import { Link, useRouteError } from 'react-router-dom'
+import { Link, useRouteError, isRouteErrorResponse } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
 import { useThemeStore } from '../store'
@@ -24,7 +24,7 @@ export default function ErrorPage() {
         <p className={`mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
           An unexpected error occurred. Please try again.
         </p>
-        {error?.statusText && (
+        {isRouteErrorResponse(error) && error.statusText && (
           <p className={`text-sm mb-6 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
             {error.statusText}
           </p>

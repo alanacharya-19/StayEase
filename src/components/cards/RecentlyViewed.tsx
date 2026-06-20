@@ -62,7 +62,7 @@ export default function RecentlyViewed() {
                 <div className="p-3">
                   <div className="flex items-center gap-1 mb-1">
                     <Star size={10} className="text-accent fill-accent" />
-                    <span className="text-xs font-medium text-gray-500">{hotel.ratings?.overall || hotel.rating}</span>
+                    <span className="text-xs font-medium text-gray-500">{hotel.rating}</span>
                   </div>
                   <h3 className={`font-semibold text-sm leading-tight mb-0.5 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {hotel.name}

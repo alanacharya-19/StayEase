@@ -1,11 +1,11 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X, Moon, Sun, Heart, User, ChevronDown, Search } from 'lucide-react'
 import { useThemeStore, useAuthStore, useWishlistStore } from '../../store'
 import { useSearchSuggestions } from '../../hooks/useQueries'
 
-const navLinks = [
+const navLinks: Array<{ to: string; label: string }> = [
   { to: '/', label: 'Home' },
   { to: '/hotels', label: 'Hotels' },
   { to: '/about', label: 'About' },
@@ -159,7 +159,7 @@ export default function Navbar() {
           >
             <div className="max-w-3xl mx-auto px-4 py-4">
               <form
-                onSubmit={(e) => { e.preventDefault(); if (searchTerm.trim()) { navigate(`/hotels?search=${encodeURIComponent(searchTerm.trim())}`); setSearchOpen(false); setSearchTerm('') } }}
+                onSubmit={(e: FormEvent) => { e.preventDefault(); if (searchTerm.trim()) { navigate(`/hotels?search=${encodeURIComponent(searchTerm.trim())}`); setSearchOpen(false); setSearchTerm('') } }}
                 className="relative"
               >
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />

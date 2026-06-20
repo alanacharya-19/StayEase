@@ -3,12 +3,13 @@ import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
 import { useThemeStore } from '../store'
 import { Breadcrumb } from '../components/ui'
 import toast from 'react-hot-toast'
+import type { FormEvent } from 'react'
 
 export default function ContactPage() {
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     toast.success('Message sent! We will get back to you soon.')
   }

@@ -5,8 +5,14 @@ import { useThemeStore, useBookingStore } from '../../store'
 import { formatCurrency, formatDate } from '../../utils'
 import { Modal } from '../ui'
 import toast from 'react-hot-toast'
+import type { Booking } from '../../types'
 
-export default function BookingCard({ booking, index = 0 }) {
+interface BookingCardProps {
+  booking: Booking & { hotelImage?: string; total?: number }
+  index?: number
+}
+
+export default function BookingCard({ booking, index = 0 }: BookingCardProps) {
   const { theme } = useThemeStore()
   const { cancelBooking } = useBookingStore()
   const isDark = theme === 'dark'

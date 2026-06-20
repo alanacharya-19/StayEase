@@ -5,4 +5,5 @@ export { default as Rating } from './Rating'
 export { default as Pagination } from './Pagination'
 export { default as Breadcrumb } from './Breadcrumb'
 export { default as ErrorBoundary } from './ErrorBoundary'
+export { default as ImageCarousel } from './ImageCarousel'
 

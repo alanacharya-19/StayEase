@@ -1,6 +1,7 @@
 import axios from 'axios'
+import type { VendorPrice } from '../types'
 
-const API_KEY = import.meta.env.VITE_MAKCORPS_API_KEY
+const API_KEY: string | undefined = import.meta.env.VITE_MAKCORPS_API_KEY
 const BASE_URL = 'https://api.makcorps.com'
 
 const makcorps = axios.create({
@@ -8,18 +9,53 @@ const makcorps = axios.create({
   timeout: 15000,
 })
 
-// In-memory cache: maps hotel name -> Makcorps hotel ID, city name -> Makcorps city ID
-const idCache = { hotels: {}, cities: {} }
+interface MappingResult {
+  type: string
+  document_id: string
+  title?: string
+  scope?: string
+}
 
-function defaultDates() {
+interface MakcorpsHotel {
+  hotelId: string
+  name: string
+  price: string
+  vendor: string
+  rating?: string
+  count?: string
+  telephone?: string
+  geocode?: string
+}
+
+interface MakcorpsPriceEntry {
+  vendor?: string
+  price?: string
+  tax?: string
+}
+
+interface MakcorpsRoomTypeResponse {
+  hotelid?: string
+  [key: string]: unknown
+}
+
+interface MakcorpsParams {
+  checkin?: string
+  checkout?: string
+  rooms?: number
+  adults?: number
+}
+
+const idCache: { hotels: Record<string, string>; cities: Record<string, string> } = { hotels: {}, cities: {} }
+
+function defaultDates(): { checkin: string; checkout: string } {
   const today = new Date()
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  const fmt = (d) => d.toISOString().split('T')[0]
+  const fmt = (d: Date): string => d.toISOString().split('T')[0]
   return { checkin: fmt(today), checkout: fmt(tomorrow) }
 }
 
-export async function mapping(query) {
+export async function mapping(query: string): Promise<MappingResult[]> {
   if (!API_KEY) return []
   try {
     const { data } = await makcorps.get('/mapping', {
@@ -31,11 +67,11 @@ export async function mapping(query) {
   }
 }
 
-export async function findCityId(cityName) {
+export async function findCityId(cityName: string): Promise<string | null> {
   if (!API_KEY) return null
   if (idCache.cities[cityName]) return idCache.cities[cityName]
   const results = await mapping(cityName)
-  const geo = results.find((r) => r.type === 'GEO')
+  const geo = results.find((r: MappingResult) => r.type === 'GEO')
   if (geo) {
     idCache.cities[cityName] = geo.document_id
     return geo.document_id
@@ -43,11 +79,11 @@ export async function findCityId(cityName) {
   return null
 }
 
-export async function findHotelId(hotelName) {
+export async function findHotelId(hotelName: string): Promise<string | null> {
   if (!API_KEY) return null
   if (idCache.hotels[hotelName]) return idCache.hotels[hotelName]
   const results = await mapping(hotelName)
-  const hotel = results.find((r) => r.type === 'HOTEL')
+  const hotel = results.find((r: MappingResult) => r.type === 'HOTEL')
   if (hotel) {
     idCache.hotels[hotelName] = hotel.document_id
     return hotel.document_id
@@ -55,7 +91,18 @@ export async function findHotelId(hotelName) {
   return null
 }
 
-export async function getHotelsByCity(cityId, params = {}) {
+export interface MakcorpsCityHotel {
+  makcorpsId: string
+  name: string
+  price: number
+  vendor: string
+  rating: number | null
+  reviewsCount: number | null
+  telephone?: string
+  geocode?: string
+}
+
+export async function getHotelsByCity(cityId: string, params: MakcorpsParams = {}): Promise<MakcorpsCityHotel[]> {
   if (!API_KEY) return []
   const { checkin, checkout } = defaultDates()
   try {
@@ -72,8 +119,8 @@ export async function getHotelsByCity(cityId, params = {}) {
       },
     })
     if (!data) return []
-    const hotels = Array.isArray(data) ? data : [data]
-    return hotels.map((h) => ({
+    const hotels: MakcorpsHotel[] = Array.isArray(data) ? data : [data]
+    return hotels.map((h: MakcorpsHotel) => ({
       makcorpsId: h.hotelId,
       name: h.name,
       price: parseFloat(String(h.price).replace(/[^0-9.]/g, '')),
@@ -88,7 +135,7 @@ export async function getHotelsByCity(cityId, params = {}) {
   }
 }
 
-export async function getHotelPrices(hotelId, params = {}) {
+export async function getHotelPrices(hotelId: string, params: MakcorpsParams = {}): Promise<VendorPrice[]> {
   if (!API_KEY) return []
   const { checkin, checkout } = defaultDates()
   try {
@@ -104,9 +151,9 @@ export async function getHotelPrices(hotelId, params = {}) {
       },
     })
     if (!data) return []
-    const entries = Array.isArray(data) ? data : [data]
-    return entries.map((e) => ({
-      vendor: e.vendor,
+    const entries: MakcorpsPriceEntry[] = Array.isArray(data) ? data : [data]
+    return entries.map((e: MakcorpsPriceEntry) => ({
+      vendor: e.vendor || '',
       price: parseFloat(String(e.price || '0').replace(/[^0-9.]/g, '')),
       tax: parseFloat(String(e.tax || '0').replace(/[^0-9.]/g, '')),
     }))
@@ -115,7 +162,7 @@ export async function getHotelPrices(hotelId, params = {}) {
   }
 }
 
-export async function getRoomTypes(hotelId, params = {}) {
+export async function getRoomTypes(hotelId: string, params: MakcorpsParams = {}): Promise<MakcorpsRoomTypeResponse[]> {
   if (!API_KEY) return []
   const { checkin, checkout } = defaultDates()
   try {

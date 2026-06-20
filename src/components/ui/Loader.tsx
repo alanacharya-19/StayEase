@@ -1,6 +1,10 @@
 import { motion } from 'framer-motion'
 
-export default function Loader({ fullScreen = false }) {
+interface LoaderProps {
+  fullScreen?: boolean
+}
+
+export default function Loader({ fullScreen = false }: LoaderProps) {
   return (
     <div className={`flex items-center justify-center ${fullScreen ? 'min-h-screen' : 'py-20'}`}>
       <div className="flex flex-col items-center gap-4">

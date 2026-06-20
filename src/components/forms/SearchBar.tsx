@@ -1,16 +1,27 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, Calendar, Users } from 'lucide-react'
 import { useThemeStore } from '../../store'
 
-export default function SearchBar({ variant = 'hero' }) {
+interface SearchBarProps {
+  variant?: 'hero' | 'inline'
+}
+
+interface SearchQuery {
+  city: string
+  checkIn: string
+  checkOut: string
+  guests: number | string
+}
+
+export default function SearchBar({ variant = 'hero' }: SearchBarProps) {
   const navigate = useNavigate()
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
-  const [query, setQuery] = useState({ city: '', checkIn: '', checkOut: '', guests: 1 })
+  const [query, setQuery] = useState<SearchQuery>({ city: '', checkIn: '', checkOut: '', guests: 1 })
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     const params = new URLSearchParams()
     if (query.city) params.set('city', query.city)

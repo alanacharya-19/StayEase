@@ -1,15 +1,26 @@
-import api from './api'
 import { hotels } from '../data/hotels'
 import { findHotelId, findCityId, getHotelsByCity, getHotelPrices } from './makcorpsApi'
+import type { Hotel, HotelQueryParams, PaginatedResponse, VendorPrice } from '../types'
+import type { MakcorpsCityHotel } from './makcorpsApi'
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+type HotelApi = {
+  getAll: (params?: HotelQueryParams) => Promise<PaginatedResponse>
+  getById: (id: string | number) => Promise<Hotel>
+  getFeatured: () => Promise<Hotel[]>
+  getPopular: () => Promise<Hotel[]>
+  getLuxury: () => Promise<Hotel[]>
+  getBudget: () => Promise<Hotel[]>
+  search: (query: string) => Promise<Hotel[]>
+}
 
-function matchByName(mockHotel, makcorpsHotels) {
+const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+function matchByName(mockHotel: Hotel, makcorpsHotels: MakcorpsCityHotel[]): MakcorpsCityHotel | undefined {
   const normalized = mockHotel.name.toLowerCase()
   return makcorpsHotels.find((mh) => normalized.includes(mh.name.toLowerCase()) || mh.name.toLowerCase().includes(normalized))
 }
 
-async function enrichWithMakcorpsPrices(hotelList, params = {}) {
+async function enrichWithMakcorpsPrices(hotelList: Hotel[], params: HotelQueryParams = {}): Promise<Hotel[]> {
   if (!import.meta.env.VITE_MAKCORPS_API_KEY || hotelList.length === 0) return hotelList
   const enriched = [...hotelList]
   try {
@@ -19,18 +30,18 @@ async function enrichWithMakcorpsPrices(hotelList, params = {}) {
       checkin: params.checkIn || params.checkin,
       checkout: params.checkOut || params.checkout,
       rooms: params.rooms || 1,
-      adults: params.adults || params.guests || 2,
+      adults: params.adults || (params.guests ? Number(params.guests) : 2),
     }
     const cityResults = await Promise.allSettled(
-      cityIds.map((c, i) => {
-        if (c.status !== 'fulfilled' || !c.value) return Promise.resolve([])
+      cityIds.map((c) => {
+        if (c.status !== 'fulfilled' || !c.value) return Promise.resolve([] as MakcorpsCityHotel[])
         return getHotelsByCity(c.value, makcorpsParams)
       })
     )
-    const cityToMakcorps = {}
+    const cityToMakcorps: Record<string, MakcorpsCityHotel[]> = {}
     uniqueCities.forEach((city, i) => {
       if (cityResults[i].status === 'fulfilled') {
-        cityToMakcorps[city] = cityResults[i].value
+        cityToMakcorps[city] = cityResults[i].value as MakcorpsCityHotel[]
       }
     })
     for (let i = 0; i < enriched.length; i++) {
@@ -48,8 +59,8 @@ async function enrichWithMakcorpsPrices(hotelList, params = {}) {
   return enriched
 }
 
-export const hotelApi = {
-  getAll: async (params = {}) => {
+export const hotelApi: HotelApi = {
+  getAll: async (params: HotelQueryParams = {}): Promise<PaginatedResponse> => {
     await delay(300)
     let result = [...hotels]
     if (params.search) {
@@ -82,12 +93,11 @@ export const hotelApi = {
     return { data: paginated, total, page, totalPages: Math.ceil(total / limit) }
   },
 
-  getById: async (id) => {
+  getById: async (id: string | number): Promise<Hotel> => {
     await delay(200)
     const hotel = hotels.find((h) => h.id === Number(id))
     if (!hotel) throw new Error('Hotel not found')
-    // Try to fetch Makcorps vendor prices
-    let vendorPrices = []
+    let vendorPrices: VendorPrice[] = []
     try {
       const makId = await findHotelId(hotel.name)
       if (makId) {
@@ -102,31 +112,31 @@ export const hotelApi = {
     return { ...hotel, similarHotels, vendorPrices }
   },
 
-  getFeatured: async () => {
+  getFeatured: async (): Promise<Hotel[]> => {
     await delay(200)
     const featured = hotels.filter((h) => h.featured)
     return enrichWithMakcorpsPrices(featured)
   },
 
-  getPopular: async () => {
+  getPopular: async (): Promise<Hotel[]> => {
     await delay(200)
     const popular = hotels.filter((h) => h.popular)
     return enrichWithMakcorpsPrices(popular)
   },
 
-  getLuxury: async () => {
+  getLuxury: async (): Promise<Hotel[]> => {
     await delay(200)
     const luxury = hotels.filter((h) => h.luxury)
     return enrichWithMakcorpsPrices(luxury)
   },
 
-  getBudget: async () => {
+  getBudget: async (): Promise<Hotel[]> => {
     await delay(200)
     const budget = hotels.filter((h) => h.budget)
     return enrichWithMakcorpsPrices(budget)
   },
 
-  search: async (query) => {
+  search: async (query: string): Promise<Hotel[]> => {
     await delay(150)
     const q = query.toLowerCase()
     return hotels.filter(

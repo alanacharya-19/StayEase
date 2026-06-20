@@ -4,8 +4,14 @@ import { Star, MapPin, Heart, Share2 } from 'lucide-react'
 import { useThemeStore, useWishlistStore } from '../../store'
 import { formatCurrency } from '../../utils'
 import toast from 'react-hot-toast'
+import type { Hotel } from '../../types'
 
-export default function HotelCard({ hotel, index = 0 }) {
+interface HotelCardProps {
+  hotel: Hotel
+  index?: number
+}
+
+export default function HotelCard({ hotel, index = 0 }: HotelCardProps) {
   const { theme } = useThemeStore()
   const { isInWishlist, toggleItem } = useWishlistStore()
   const isDark = theme === 'dark'
@@ -87,7 +93,7 @@ export default function HotelCard({ hotel, index = 0 }) {
             </h3>
             <div className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-0.5 rounded-lg text-xs font-semibold shrink-0">
               <Star size={12} fill="currentColor" />
-              <span>{hotel.ratings?.overall || hotel.rating}</span>
+              <span>{hotel.ratings.overall}</span>
             </div>
           </div>
 

@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-export default function ImageCarousel({ images, className = '' }) {
+interface ImageCarouselProps {
+  images: string[]
+  className?: string
+}
+
+export default function ImageCarousel({ images, className = '' }: ImageCarouselProps) {
   const [current, setCurrent] = useState(0)
   const [direction, setDirection] = useState(0)
 

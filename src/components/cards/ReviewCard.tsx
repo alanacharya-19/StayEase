@@ -1,7 +1,12 @@
 import { Star, ThumbsUp } from 'lucide-react'
 import { useThemeStore } from '../../store'
+import type { HotelReview } from '../../types'
 
-export default function ReviewCard({ review }) {
+interface ReviewCardProps {
+  review: HotelReview
+}
+
+export default function ReviewCard({ review }: ReviewCardProps) {
   const { theme } = useThemeStore()
   const isDark = theme === 'dark'
 

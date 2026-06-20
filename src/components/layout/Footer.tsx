@@ -2,7 +2,12 @@ import { Link } from 'react-router-dom'
 import { useThemeStore } from '../../store'
 import { Mail, Phone, MapPin, Globe, Camera, MessageCircle, Video, ChevronRight } from 'lucide-react'
 
-const footerLinks = {
+interface FooterLink {
+  to: string
+  label: string
+}
+
+const footerLinks: Record<string, FooterLink[]> = {
   company: [
     { to: '/about', label: 'About Us' },
     { to: '/contact', label: 'Contact' },
