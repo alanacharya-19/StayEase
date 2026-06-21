@@ -25,27 +25,37 @@ async function groqChat(messages: Array<{ role: string; content: string }>, maxT
   const key = getApiKey()
   if (!key) return null
 
-  const res = await fetch(GROQ_API, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${key}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages,
-      temperature: 0.7,
-      max_tokens: maxTokens,
-    }),
-  })
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 4000)
 
-  if (!res.ok) {
-    console.error('Groq HTTP error:', res.status)
+  try {
+    const res = await fetch(GROQ_API, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages,
+        temperature: 0.7,
+        max_tokens: maxTokens,
+      }),
+      signal: controller.signal,
+    })
+
+    if (!res.ok) {
+      console.error('Groq HTTP error:', res.status)
+      return null
+    }
+
+    const data = await res.json()
+    return data.choices?.[0]?.message?.content || null
+  } catch {
     return null
+  } finally {
+    clearTimeout(timer)
   }
-
-  const data = await res.json()
-  return data.choices?.[0]?.message?.content || null
 }
 
 // --- Mock fallbacks for when API key is missing or invalid ---
