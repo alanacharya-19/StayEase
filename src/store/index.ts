@@ -137,4 +137,38 @@ export const useRecentStore = create<RecentState>()(
   )
 )
 
+export interface SavedItinerary {
+  id: string
+  destination: string
+  days: number
+  budget: string
+  content: string
+  createdAt: string
+}
+
+interface ItineraryState {
+  savedItineraries: SavedItinerary[]
+  saveItinerary: (itinerary: SavedItinerary) => void
+  removeItinerary: (id: string) => void
+  getItinerary: (id: string) => SavedItinerary | undefined
+  offlineMode: boolean
+  setOfflineMode: (val: boolean) => void
+}
+
+export const useItineraryStore = create<ItineraryState>()(
+  persist(
+    (set, get) => ({
+      savedItineraries: [],
+      offlineMode: false,
+      saveItinerary: (itinerary) =>
+        set((state) => ({ savedItineraries: [itinerary, ...state.savedItineraries] })),
+      removeItinerary: (id) =>
+        set((state) => ({ savedItineraries: state.savedItineraries.filter((i) => i.id !== id) })),
+      getItinerary: (id) => get().savedItineraries.find((i) => i.id === id),
+      setOfflineMode: (val) => set({ offlineMode: val }),
+    }),
+    { name: 'stayease-itineraries' }
+  )
+)
+
 
