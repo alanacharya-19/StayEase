@@ -80,6 +80,15 @@ body {
   color: #2563eb;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Hide scrollbar but allow scrolling */
 html {
   overflow-y: scroll;

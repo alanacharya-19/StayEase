@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { Navbar, Footer } from '../components/layout'
 import { useThemeStore } from '../store'
 import { motion } from 'framer-motion'
+import AiChatbot from '../components/ai/AiChatbot'
 
 export default function MainLayout() {
   const { theme } = useThemeStore()
@@ -22,6 +23,7 @@ export default function MainLayout() {
         </main>
         <Footer />
       </div>
+      <AiChatbot />
     </div>
   )
 }

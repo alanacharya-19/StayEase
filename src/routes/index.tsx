@@ -17,6 +17,7 @@ const AboutPage = lazy(() => import('../pages/AboutPage'))
 const ContactPage = lazy(() => import('../pages/ContactPage'))
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'))
 const ErrorPage = lazy(() => import('../pages/ErrorPage'))
+const TripToolsPage = lazy(() => import('../pages/TripToolsPage'))
 
 export default function AppRoutes() {
   return (
@@ -38,6 +39,7 @@ export default function AppRoutes() {
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/trip-tools" element={<TripToolsPage />} />
           <Route path="/error" element={<ErrorPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>

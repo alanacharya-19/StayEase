@@ -9,6 +9,7 @@ import AuthModal from '../auth/AuthModal'
 const navLinks: Array<{ to: string; label: string }> = [
   { to: '/', label: 'Home' },
   { to: '/hotels', label: 'Hotels' },
+  { to: '/trip-tools', label: 'Trip Tools' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
 ]
