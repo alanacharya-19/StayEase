@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { User, Hotel, Booking } from '../types'
+import type { User, Hotel, Booking, UserReview } from '../types'
 
 interface ThemeState {
   theme: string
@@ -168,6 +168,54 @@ export const useItineraryStore = create<ItineraryState>()(
       setOfflineMode: (val) => set({ offlineMode: val }),
     }),
     { name: 'stayease-itineraries' }
+  )
+)
+
+interface ReviewState {
+  reviews: UserReview[]
+  addReview: (review: UserReview) => void
+  getReviewsByHotel: (hotelId: number) => UserReview[]
+  upvoteReview: (reviewId: string, userId: string | number) => void
+  hasUserReviewed: (hotelId: number, userId: string | number) => boolean
+  getUserReviews: (userId: string | number) => UserReview[]
+  getCompletedBookingIds: (userId: string | number) => string[]
+  markCompleted: (bookingId: string) => void
+  completedBookingIds: string[]
+}
+
+export const useReviewStore = create<ReviewState>()(
+  persist(
+    (set, get) => ({
+      reviews: [],
+      completedBookingIds: [],
+      addReview: (review) =>
+        set((state) => ({ reviews: [review, ...state.reviews] })),
+      getReviewsByHotel: (hotelId) =>
+        get().reviews.filter((r) => r.hotelId === hotelId),
+      upvoteReview: (reviewId, userId) =>
+        set((state) => ({
+          reviews: state.reviews.map((r) =>
+            r.id === reviewId
+              ? r.upvotedBy.includes(userId)
+                ? { ...r, upvotes: r.upvotes - 1, upvotedBy: r.upvotedBy.filter((u) => u !== userId) }
+                : { ...r, upvotes: r.upvotes + 1, upvotedBy: [...r.upvotedBy, userId] }
+              : r
+          ),
+        })),
+      hasUserReviewed: (hotelId, userId) =>
+        get().reviews.some((r) => r.hotelId === hotelId && r.userId === userId),
+      getUserReviews: (userId) =>
+        get().reviews.filter((r) => r.userId === userId),
+      getCompletedBookingIds: (userId) =>
+        get().completedBookingIds,
+      markCompleted: (bookingId) =>
+        set((state) => ({
+          completedBookingIds: state.completedBookingIds.includes(bookingId)
+            ? state.completedBookingIds
+            : [...state.completedBookingIds, bookingId],
+        })),
+    }),
+    { name: 'stayease-reviews' }
   )
 )
 

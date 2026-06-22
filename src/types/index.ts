@@ -114,6 +114,25 @@ export interface User {
   token?: string
 }
 
+export interface UserReview {
+  id: string
+  hotelId: number
+  userId: string | number
+  userName: string
+  userAvatar: string
+  rating: number
+  cleanliness: number
+  location: number
+  service: number
+  value: number
+  comment: string
+  photos: string[]
+  createdAt: string
+  upvotes: number
+  upvotedBy: (string | number)[]
+  bookingId?: string
+}
+
 export interface Booking {
   id: string
   hotelId: number
