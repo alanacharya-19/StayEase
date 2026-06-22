@@ -60,39 +60,64 @@ async function groqChat(messages: Array<{ role: string; content: string }>, maxT
 
 // --- Mock fallbacks for when API key is missing or invalid ---
 
+function wordMatch(msg: string, ...words: string[]): boolean {
+  return words.some((w) => new RegExp(`\\b${w}\\b`).test(msg))
+}
+
+const destinationResponses: [RegExp, string][] = [
+  [/\\bnepal\\b/i, 'Nepal has amazing spots! Kathmandu (temples & culture), Pokhara (lakes & trekking), Chitwan (safari), Lumbini (Buddha\'s birthplace), and Everest Base Camp for trekkers.'],
+  [/\\bbali\\b/i, 'Bali is stunning! Top areas: Ubud (rice terraces & yoga), Seminyak (beach clubs & dining), Uluwatu (cliffs & surfing), and Nusa Dua (luxury resorts).'],
+  [/\\bparis\\b/i, 'Paris is magical! Must-sees: Eiffel Tower, Louvre, Montmartre, Le Marais for shopping, and Seine river cruises. Great hotels near Champs-Élysées or Saint-Germain.'],
+  [/\\bdubai\\b/i, 'Dubai has it all! Burj Khalifa, Dubai Mall, Palm Jumeirah beaches, and desert safaris. For hotels: try Dubai Marina, Downtown, or JBR Walk.'],
+  [/\\btokyo\\b/i, 'Tokyo is incredible! Explore Shibuya, Shinjuku, Asakusa (old town), and Akihabara. Great hotel areas: Shinjuku, Ginza, or near Tokyo Station.'],
+  [/\\bnew york\\b/i, 'NYC has endless energy! Must-visits: Central Park, Times Square, Brooklyn Bridge, and museums. Hotel picks: Midtown, SoHo, or Williamsburg.'],
+  [/\\blondon\\b/i, 'London is packed with history! Big Ben, Tower of London, Buckingham Palace, and Camden Market. Stay in Covent Garden, South Bank, or Kensington.'],
+  [/\\bbangkok\\b/i, 'Bangkok is vibrant! Grand Palace, Chatuchak Market, Khao San Road, and amazing street food. Try hotels in Sukhumvit or Riverside.'],
+  [/\\bsingapore\\b/i, 'Singapore shines! Marina Bay, Gardens by the Bay, Sentosa Island, and hawker centers. Stay in Marina Bay, Orchard Road, or Clarke Quay.'],
+  [/\\bgoa\\b/i, 'Goa is perfect for beaches! North Goa (party & crowds) vs South Goa (peaceful & luxury). Try Calangute, Baga, or Palolem beach stays.'],
+]
+
 function mockChat(userMsg: string): string {
-  const msg = userMsg.toLowerCase()
-  if (msg.includes('hello') || msg.includes('hi') || msg.includes('hey')) {
+  const msg = userMsg.toLowerCase().trim()
+
+  for (const [pattern, response] of destinationResponses) {
+    if (pattern.test(userMsg)) return response
+  }
+
+  if (wordMatch(msg, 'hello', 'hi', 'hey', 'good morning', 'good evening')) {
     return 'Hey there! How can I help with your travel plans?'
   }
-  if (msg.includes('hotel') || msg.includes('place to stay')) {
+  if (wordMatch(msg, 'hotels?', 'accommodation', 'stay', 'rooms?', 'place to stay')) {
     return 'We have tons of hotels! What city are you thinking about? I can recommend options based on your budget.'
   }
-  if (msg.includes('cheap') || msg.includes('budget') || msg.includes('affordable')) {
+  if (wordMatch(msg, 'cheap', 'budget', 'affordable', 'cheapest', 'low cost', 'inexpensive')) {
     return 'Looking for budget-friendly stays? Cities like Bali, Bangkok, and Goa have great options under $100/night. Want me to check a specific destination?'
   }
-  if (msg.includes('luxury') || msg.includes('5 star') || msg.includes('premium')) {
+  if (wordMatch(msg, 'luxury', '5 star', 'premium', 'high end', 'vip')) {
     return 'Love it! Dubai, Paris, and Tokyo have incredible luxury hotels. The Royal Towers in Dubai or the Ritz in Paris are top picks. What\'s your destination?'
   }
-  if (msg.includes('flight') || msg.includes('fly') || msg.includes('airfare')) {
+  if (wordMatch(msg, 'flight', 'fly', 'airfare', 'airplane', 'plane')) {
     return 'I can help with hotels on the ground! For flights, I\'d suggest checking Google Flights or Skyscanner for the best deals. Want hotel recommendations once you land?'
   }
-  if (msg.includes('restaurant') || msg.includes('eat') || msg.includes('food')) {
+  if (wordMatch(msg, 'restaurant', 'eat', 'food', 'dining', 'cuisine', 'lunch', 'dinner')) {
     return 'Every city has amazing food! Paris has great bistros, Tokyo has incredible ramen joints, and NYC has everything. What city are you visiting?'
   }
-  if (msg.includes('weather') || msg.includes('climate') || msg.includes('season')) {
+  if (wordMatch(msg, 'weather', 'climate', 'season', 'rainy', 'sunny', 'temperature')) {
     return 'The best time to travel depends on where you\'re headed! Summer (June-Aug) is peak in Europe, while winter is great for Dubai and Southeast Asia. What\'s your destination?'
   }
-  if (msg.includes('visa') || msg.includes('passport') || msg.includes('documents')) {
+  if (wordMatch(msg, 'visa', 'passport', 'documents', 'travel document')) {
     return 'Visa requirements vary by country. Most places need at least 6 months of passport validity. Check your destination\'s embassy site for the latest rules!'
   }
-  if (msg.includes('thank')) {
+  if (wordMatch(msg, 'thank', 'thanks', 'thank you')) {
     return 'You\'re welcome! Happy travels — let me know if you need anything else!'
   }
-  if (msg.includes('by') || msg.includes('goodbye') || msg.includes('see you')) {
+  if (wordMatch(msg, 'bye', 'goodbye', 'see you', 'see ya')) {
     return 'Safe travels! Come back anytime you need trip help :)'
   }
-  return `Great question about "${userMsg}"! I'd recommend checking out our hotel listings for the best options. What city are you interested in?`
+  if (wordMatch(msg, 'popular', 'best', 'recommend', 'top', 'must see', 'attraction', 'visit', 'tourist')) {
+    return 'Our most popular destinations are New York, Paris, Dubai, Tokyo, Bali, and London. Which one catches your eye? I can share top attractions and hotel tips!'
+  }
+  return `Great question! Could you tell me which city or country you're interested in? I'd love to give you specific recommendations for hotels and attractions.`
 }
 
 function mockItinerary(destination: string, days: number, budget: string): string {
