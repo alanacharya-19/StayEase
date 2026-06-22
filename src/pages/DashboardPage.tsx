@@ -153,7 +153,7 @@ export default function DashboardPage() {
           </div>
         )
       case 'reviews':
-        return <UserReviews isDark={isDark} />
+        return <UserReviewsTab isDark={isDark} user={user} />
       case 'notifications':
         return (
           <div className={`p-6 text-center rounded-xl ${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'}`}>
@@ -240,6 +240,32 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function UserReviewsTab({ isDark, user }: { isDark: boolean; user: { id: string | number } | null }) {
+  const { getUserReviews } = useReviewStore()
+  const myReviews = user ? getUserReviews(user.id) : []
+
+  if (myReviews.length === 0) {
+    return (
+      <div className={`p-6 text-center rounded-xl ${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'}`}>
+        <Star size={40} className="mx-auto mb-3 text-gray-400" />
+        <p className={`text-sm mb-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>No reviews yet.</p>
+        <p className={`text-xs mb-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+          Reviews you write after completed stays will appear here.
+        </p>
+        <Link to="/hotels" className="text-sm text-primary hover:underline">Browse Hotels</Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {myReviews.map((review, i) => (
+        <UserReviewCard key={review.id} review={review} index={i} />
+      ))}
     </div>
   )
 }

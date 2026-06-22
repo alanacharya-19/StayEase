@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Calendar, Users, XCircle } from 'lucide-react'
-import { useThemeStore, useBookingStore } from '../../store'
+import { Calendar, Users, XCircle, Star } from 'lucide-react'
+import { useThemeStore, useBookingStore, useReviewStore, useAuthStore } from '../../store'
 import { formatCurrency, formatDate } from '../../utils'
 import { Modal } from '../ui'
 import toast from 'react-hot-toast'
@@ -15,10 +16,15 @@ interface BookingCardProps {
 export default function BookingCard({ booking, index = 0 }: BookingCardProps) {
   const { theme } = useThemeStore()
   const { cancelBooking } = useBookingStore()
+  const { hasUserReviewed } = useReviewStore()
+  const { user } = useAuthStore()
+  const navigate = useNavigate()
   const isDark = theme === 'dark'
   const [showCancelModal, setShowCancelModal] = useState(false)
 
   const isCancelled = booking.status === 'cancelled'
+  const isCompleted = booking.status === 'completed' || (new Date(booking.checkOut) < new Date() && booking.status !== 'cancelled')
+  const alreadyReviewed = user ? hasUserReviewed(booking.hotelId, user.id) : false
 
   const handleCancel = () => {
     cancelBooking(booking.id)
@@ -75,7 +81,22 @@ export default function BookingCard({ booking, index = 0 }: BookingCardProps) {
                 Booking ID: {booking.id}
               </span>
               <div className="flex items-center gap-3">
-                {!isCancelled && (
+                {isCompleted && !alreadyReviewed && (
+                  <button
+                    onClick={() => navigate(`/hotels/${booking.hotelId}`)}
+                    className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                  >
+                    <Star size={14} />
+                    Write Review
+                  </button>
+                )}
+                {isCompleted && alreadyReviewed && (
+                  <span className="flex items-center gap-1 text-xs text-green-500 font-medium">
+                    <Star size={14} />
+                    Reviewed
+                  </span>
+                )}
+                {!isCancelled && !isCompleted && (
                   <button
                     onClick={() => setShowCancelModal(true)}
                     className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 font-medium transition-colors"
