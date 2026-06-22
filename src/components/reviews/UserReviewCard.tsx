@@ -4,6 +4,7 @@ import { Star, ThumbsUp, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useThemeStore, useAuthStore, useReviewStore } from '../../store'
 import type { UserReview } from '../../types'
 import { formatDate } from '../../utils'
+import toast from 'react-hot-toast'
 
 interface UserReviewCardProps {
   review: UserReview

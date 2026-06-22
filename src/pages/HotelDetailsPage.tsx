@@ -4,8 +4,9 @@ import { motion } from 'framer-motion'
 import { Star, MapPin, Check, X, Share2, Heart, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useThemeStore, useWishlistStore, useRecentStore } from '../store'
 import { useHotel } from '../hooks/useQueries'
-import { HotelCard, ReviewCard, RoomCard } from '../components/cards'
-import { SkeletonHotelDetail, Rating } from '../components/ui'
+import { HotelCard, RoomCard } from '../components/cards'
+import { ReviewsSection } from '../components/reviews'
+import { SkeletonHotelDetail } from '../components/ui'
 import Breadcrumb from '../components/ui/Breadcrumb'
 import { formatCurrency } from '../utils'
 import toast from 'react-hot-toast'
@@ -191,48 +192,13 @@ export default function HotelDetailsPage() {
             </motion.div>
 
             {/* Reviews */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  Guest Reviews
-                </h2>
-                <div className="flex items-center gap-2">
-                  <Rating value={hotel.ratings.overall} size={14} />
-                  <span className="text-2xl font-bold text-primary">{hotel.ratings.overall}</span>
-                </div>
-              </div>
-
-              {/* Rating Breakdown */}
-              <div className={`grid grid-cols-2 gap-3 mb-6 p-4 rounded-xl ${isDark ? 'bg-dark-border/50' : 'bg-gray-50'}`}>
-                {[
-                  { label: 'Cleanliness', value: hotel.ratings.cleanliness },
-                  { label: 'Location', value: hotel.ratings.location },
-                  { label: 'Service', value: hotel.ratings.service },
-                  { label: 'Value for Money', value: hotel.ratings.value },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{item.label}</span>
-                      <span className="text-xs font-semibold text-primary">{item.value.toFixed(1)}</span>
-                    </div>
-                    <div className={`h-1.5 rounded-full overflow-hidden ${isDark ? 'bg-dark-border' : 'bg-gray-200'}`}>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${(item.value / 5) * 100}%` }}
-                        viewport={{ once: true }}
-                        className="h-full rounded-full bg-primary"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {hotel.reviews.map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
-              </div>
-            </motion.div>
+            <ReviewsSection
+              hotelId={hotel.id}
+              hotelName={hotel.name}
+              staticReviews={hotel.reviews}
+              ratings={hotel.ratings}
+              reviewsCount={hotel.reviewsCount}
+            />
           </div>
 
           {/* Sidebar - Price Card */}

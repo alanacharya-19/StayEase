@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { User, Calendar, Heart, Star, Bell, Settings, LogOut, Clock } from 'lucide-react'
-import { useThemeStore, useAuthStore, useBookingStore, useWishlistStore } from '../store'
+import { useThemeStore, useAuthStore, useBookingStore, useWishlistStore, useReviewStore } from '../store'
 import { BookingCard, HotelCard } from '../components/cards'
+import { UserReviewCard } from '../components/reviews'
+import { Link } from 'react-router-dom'
 import { Breadcrumb } from '../components/ui'
 import toast from 'react-hot-toast'
 
@@ -151,12 +153,7 @@ export default function DashboardPage() {
           </div>
         )
       case 'reviews':
-        return (
-          <div className={`p-6 text-center rounded-xl ${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'}`}>
-            <Star size={40} className="mx-auto mb-3 text-gray-400" />
-            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>No reviews yet. Your reviews will appear here.</p>
-          </div>
-        )
+        return <UserReviews isDark={isDark} />
       case 'notifications':
         return (
           <div className={`p-6 text-center rounded-xl ${isDark ? 'bg-dark-card border border-dark-border' : 'bg-white border border-gray-100'}`}>
